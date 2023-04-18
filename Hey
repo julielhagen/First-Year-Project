@@ -1,4 +1,0 @@
-#hey kan man lave kode her?
-x = [i in range(10)]
-for i in x:
-  print(i)
