@@ -20,7 +20,7 @@ def prep_im_and_gt(im_id, im_dir_path, gt_dir_path, scalar = 1):
 
     # Read and resize image
     im = plt.imread(im_dir_path + im_id + ".png")[:, :, :3] #Some images have fourth, empty color chanel which we slice of here
-    im = rescale(im, scalar, anti_aliasing=True)
+    im = rescale(im, scalar, anti_aliasing=True, channel_axis = 2) #IDWE: Use channel_axis=2 to prevent picture from being turned bianry when rescaled
 
     #Read and resize ground truth segmentation
     gt = plt.imread(gt_dir_path + im_id + "_GT.png")
@@ -53,7 +53,7 @@ def prep_im(im_id, im_dir_path = "", scalar = 1):
         im = plt.imread(im_id)[:, :, :3] #Some images have fourth, empty color chanel which we slice of here
     else:
         im = plt.imread(im_dir_path + im_id + ".png")[:, :, :3] #Some images have fourth, empty color chanel which we slice of here
-    im = rescale(im, scalar, anti_aliasing=True)
+    im = rescale(im, scalar, anti_aliasing=True, channel_axis = 2) #IDWE: Use channel_axis=2 to prevent picture from being turned bianry when rescaled
 
     return im
 
