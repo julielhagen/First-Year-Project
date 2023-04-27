@@ -7,14 +7,18 @@ from os.path import isfile, join
 import os
 
 # Load the data
-image_folder_path = "Users\idawe\Pictures\imgs_part_1"
+image_folder_path = "imgs_part_1"
 n_images = 100
 paths = [f for f in listdir(image_folder_path) if isfile(join(image_folder_path, f))][:n_images]
 
-print(paths)
 
 # TODO: load labels for images
 # y = [lab_of_image1, ...]
+data = np.array([i.strip().split(',') for i in open('metadata.csv')][:n_images])
+mask = data == ''
+data[np.where(mask)] = np.nan
+
+print(data)
 
 # Load images
 #images = []
