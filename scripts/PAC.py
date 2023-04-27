@@ -5,6 +5,8 @@ from sklearn.neighbors import KNeighborsClassifier
 from os import listdir
 from os.path import isfile, join
 import os
+from skimage.transform import resize
+from prep_image import prep_im
 
 # Load the data
 image_folder_path = "imgs_part_1"
@@ -19,19 +21,18 @@ data = np.array([i.strip().split(',') for i in open('metadata.csv')])
 mask = data == ''
 data[np.where(mask)] = np.nan
 
-rows = np.where(data[:,-2]==paths[i])[0][0]
-print(rows)
-#labels = np.asarray([data[rows,[17,-2]] for i in range(len(paths))])
-
-#print(labels)
+labels = np.asarray([data[np.where(data[:,-2]==paths[i])[0][0],[17,-2]] for i in range(len(paths))])
+print(labels)
 
 # Load images
-#images = []
-#for im_path in paths:
-#  image = Image.open(join(image_folder_path, im_path))
-#  arr = np.asarray(image)
-#  arr = arr[:180, :180, :3] # Make sure the image has the same size
-#  images.append(arr)
+images = []
+for im_path in paths:
+  image = Image.open(join(image_folder_path, im_path))
+  image = resize(image, (300,300)) # Make sure the image has the same size
+  arr = np.asarray(image)
+  images.append(arr)
+
+print(images)
 
 # Turn the list of images (a.k.a. list of 3D np arrays) into a 4D np array
 #X = np.stack(images, axis = 0)
