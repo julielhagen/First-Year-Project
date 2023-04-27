@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from skimage.transform import resize, rescale
 
-def prep_im_and_gt(im_id, im_dir_path, gt_dir_path, scalar = 1, output_shape = null):
+def prep_im_and_gt(im_id, im_dir_path, gt_dir_path, scalar = 1, output_shape = None):
     '''Prepare image and corresponding ground truth segmentation from test images. 
     Paths to directories containing image and ground truth files required.
     If parameter scalar is passed, output image will be scaled by it. Defualt 1 retains original size.
@@ -37,7 +37,7 @@ def prep_im_and_gt(im_id, im_dir_path, gt_dir_path, scalar = 1, output_shape = n
 
     return im, gt
 
-def prep_im(im_id, im_dir_path = "", scalar = 1, output_shape = null):
+def prep_im(im_id, im_dir_path = "", scalar = 1, output_shape = None):
     '''Prepare image from im_id and optional dictory path.
     If directory path is not passed, the whole filepath, including filetype notation, 
     should be given as im_id. If parameter scalar is passed, output image will be scaled by it. 
@@ -63,7 +63,7 @@ def prep_im(im_id, im_dir_path = "", scalar = 1, output_shape = null):
 
     return im
 
-def prep_gt(im_id, gt_dir_path = "", scalar = 1, output_shape = null):
+def prep_gt(im_id, gt_dir_path = "", scalar = 1, output_shape = None):
     '''Prepare ground truth segmentaion from im_id and optional dictory path.
     If directory path is not passed, the whole filepath, including filetype notation, 
     should be given as im_id. If parameter scalar is passed, output image will be scaled by it. 
