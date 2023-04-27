@@ -25,7 +25,7 @@ def convexity(mask):
     # Compute area of convex hull
     convex_hull_area = hull.volume
 
-    # Compute convexity as ratio of convex hull area to lesion area
+    # Compute convexity as ratio of lesion area to convex hull
     convexity = lesion_area / convex_hull_area
     
     return round(1-convexity, 3)
