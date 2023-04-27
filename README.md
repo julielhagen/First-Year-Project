@@ -10,3 +10,6 @@ How can we mesure diameter?
 Can we use the data in the csv or should we assume that we only have the pictures and no further data, such as age, diameter, etc.?
 
 How are we supposed to use measure of areal and perimeter? These measures depends on how the picture is taken, so can we compare them for different pictures?
+
+# Links
+https://fisherzachary.github.io/public/r-output.html
