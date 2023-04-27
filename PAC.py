@@ -14,11 +14,16 @@ paths = [f for f in listdir(image_folder_path) if isfile(join(image_folder_path,
 
 # TODO: load labels for images
 # y = [lab_of_image1, ...]
-data = np.array([i.strip().split(',') for i in open('metadata.csv')][:n_images])
+data = np.array([i.strip().split(',') for i in open('metadata.csv')])
+
 mask = data == ''
 data[np.where(mask)] = np.nan
 
-print(data)
+rows = np.where(data[:,-2]==paths[i])[0][0]
+print(rows)
+#labels = np.asarray([data[rows,[17,-2]] for i in range(len(paths))])
+
+#print(labels)
 
 # Load images
 #images = []
