@@ -22,7 +22,7 @@ def compactness_score(mask):
     struct_el = morphology.disk(2)
 
     # Use this "brush" to erode the image - eat away at the borders
-    mask_eroded = morphology.binary_erosion(gt, struct_el)
+    mask_eroded = morphology.binary_erosion(mask, struct_el)
 
     #Finding the perimeter of the ground truth
     perimeter_gt = mask - mask_eroded
