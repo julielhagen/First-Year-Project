@@ -2,7 +2,7 @@ import numpy as np
 from scipy.spatial import ConvexHull
 import matplotlib.pyplot as plt
 
-def convexity(mask):
+def convexity_score(mask):
     '''Calculate convexity score between 0 and 1, 
     with 0 indicating a smoother border and 1 a more crooked border.
 
@@ -46,7 +46,7 @@ def show_convex_hull(mask):
 
     # Compute convex hull of lesion pixels
     hull = ConvexHull(coords)
-    
+
     plt.imshow(mask, cmap='gray')
 
     # Plot convex hull
