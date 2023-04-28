@@ -41,6 +41,12 @@ def show_convex_hull(mask):
         plot: plot including mask and convex hull boundary.
     '''
 
+    # Get coordinates of all pixels in the lesion mask
+    coords = np.transpose(np.nonzero(mask))
+
+    # Compute convex hull of lesion pixels
+    hull = ConvexHull(coords)
+    
     plt.imshow(mask, cmap='gray')
 
     # Plot convex hull
