@@ -56,7 +56,7 @@ def prep_im(im_id, im_dir_path = "", scalar = 1, output_shape = None):
     if im_dir_path == "":
         im = plt.imread(im_id)[:, :, :3] #Some images have fourth, empty color chanel which we slice of here
     else:
-        im = plt.imread(im_dir_path + im_id + ".png")[:, :, :3] #Some images have fourth, empty color chanel which we slice of here
+        im = plt.imread(im_dir_path + im_id)[:, :, :3] #Some images have fourth, empty color chanel which we slice of here
     im = rescale(im, scalar, anti_aliasing=True, channel_axis = 2) #IDWE: Use channel_axis=2 to prevent picture from being turned bianry when rescaled
     if output_shape != None:
         im = resize(im, output_shape)
