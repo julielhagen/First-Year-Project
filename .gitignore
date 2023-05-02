@@ -2,3 +2,9 @@
 imgs_part_1/
 __pycache__/
 .ipynb_checkpoints/
+imgs_mel/
+imgs_ack/
+imgs_bcc/
+imgs_nev/
+imgs_scc/
+imgs_sek/
