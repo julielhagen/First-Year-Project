@@ -7,6 +7,8 @@ Our current fucntion for loading in the images makes the RGB values a float betw
 
 Where in the process should we use PCA? Should we use it in combination with or before the other methods for featre extraction?
 
+How will the files for the given segmentation be named? For our functions
+
 # Features?
 How can we mesure diameter?
 
