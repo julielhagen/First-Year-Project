@@ -29,7 +29,7 @@ def segments(image, mask, n_segments = 50, compactness = 0.1):
     
     return slic_segments
 
-def rgb_means(image, slic_segments):
+def rgb_means_get(image, slic_segments):
     '''Get mean RGB values for each segment in a SLIC segmented image.
 
     Args:
@@ -74,7 +74,11 @@ def color_var(image, mask, n_segments = 50, compactness = .1):
     '''
 
     slic_segments = segments(image, mask, n_segments, compactness)
-    rgb_means = rgb_means(image, slic_segments)
+    rgb_means = rgb_means_get(image, slic_segments)
+
+    # If there is only 1 slic segment, return (0, 0, 0)
+    if len(np.unique(slic_segments)) == 2:
+        return 0, 0, 0
 
     #Seperate and collect channel means together in lists
     red = []
@@ -115,7 +119,11 @@ def color_sd(image, mask, n_segments = 50, compactness = .1):
     '''
 
     slic_segments = segments(image, mask, n_segments, compactness)
-    rgb_means = rgb_means(image, slic_segments)
+    rgb_means = rgb_means_get(image, slic_segments)
+
+    # If there is only 1 slic segment, return (0, 0, 0)
+    if len(np.unique(slic_segments)) == 2:
+        return 0, 0, 0
 
     #Seperate and collect channel means together in lists
     red = []
