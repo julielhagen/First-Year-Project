@@ -2,51 +2,55 @@ import numpy as np
 import matplotlib.pyplot as plt
 from skimage.transform import resize, rescale
 
-def prep_im_and_gt(im_id, im_dir_path, gt_dir_path, scalar = 1, output_shape = None):
-    '''Prepare image and corresponding ground truth segmentation from test images. 
-    Paths to directories containing image and ground truth files required.
+def prep_im_and_mask(im_id, im_dir_path, mask_dir_path, scalar = 1, output_shape = None):
+    '''Prepare image and corresponding mask segmentation from test images. 
+    Paths to directories containing image and mask files required.
     If parameter scalar is passed, output image will be scaled by it. Defualt 1 retains original size.
+    If parameter output_shape is passed_ output image will be resized to it. Defualt None retains original size.
 
     Args:
         im_id (str): image ID
         im_dir_path (str): image directory path 
         gt_dir_path (str): ground thruth directory path
         scalar (float, optional): rescale coefficient
+        output_shape (tuple, optional): resize tuple
 
     Returns:
         im (numpy.ndarray): image
-        gt (numpy.ndarray): ground truth segmentation.
+        gt (numpy.ndarray): mask segmentation.
     '''
 
     # Read and resize image
-    im = plt.imread(im_dir_path + im_id + ".png")[:, :, :3] #Some images have fourth, empty color chanel which we slice of here
+    im = plt.imread(im_dir_path + im_id)[:, :, :3] #Some images have fourth, empty color chanel which we slice of here
     im = rescale(im, scalar, anti_aliasing=True, channel_axis = 2) 
-    if output_shape != None:
+    if output_shape != None and scalar == 1:
         im = resize(im, output_shape)
 
-    #Read and resize ground truth segmentation
-    gt = plt.imread(gt_dir_path + im_id + "_GT.png")
-    gt = rescale(gt, scalar, anti_aliasing=False)
-    if output_shape != None:
-        gt = resize(gt, output_shape)
+    #Read and resize mask segmentation
+    mask = plt.imread(mask_dir_path + im_id[:-4] + "_mask.png")
+    mask = rescale(mask, scalar, anti_aliasing=False)
+    if output_shape != None and scalar == 1:
+        mask = resize(mask, output_shape)
 
-    #Return GT to binary
-    binary_gt = np.zeros_like(gt)
-    binary_gt[gt > .5] = 1
-    gt = binary_gt.astype(int)
+    #Return mask to binary
+    binary_gt = np.zeros_like(mask)
+    binary_gt[mask > .5] = 1
+    mask = binary_gt.astype(int)
 
-    return im, gt
+    return im, mask
 
 def prep_im(im_id, im_dir_path = "", scalar = 1, output_shape = None):
     '''Prepare image from im_id and optional dictory path.
     If directory path is not passed, the whole filepath, including filetype notation, 
-    should be given as im_id. If parameter scalar is passed, output image will be scaled by it. 
-    Defualt 1 retains original size.
+    should be given as im_id. 
+    If parameter scalar is passed, output image will be scaled by it. Defualt 1 retains original size.
+    If parameter output_shape is passed_ output image will be resized to it. Defualt None retains original size.
     
     Args:
         im_id (str): image ID
         im_dir_path (str, optional): image directory path
         scalar (float, optional): rescale coefficient
+        output_shape (tuple, optional): resize tuple
 
     Returns:
         im (numpy.ndarray): image.
@@ -58,38 +62,40 @@ def prep_im(im_id, im_dir_path = "", scalar = 1, output_shape = None):
     else:
         im = plt.imread(im_dir_path + im_id)[:, :, :3] #Some images have fourth, empty color chanel which we slice of here
     im = rescale(im, scalar, anti_aliasing=True, channel_axis = 2) #IDWE: Use channel_axis=2 to prevent picture from being turned bianry when rescaled
-    if output_shape != None:
+    if output_shape != None and scalar == 1:
         im = resize(im, output_shape)
 
     return im
 
-def prep_gt(im_id, gt_dir_path = "", scalar = 1, output_shape = None):
-    '''Prepare ground truth segmentaion from im_id and optional dictory path.
+def prep_mask(im_id, mask_dir_path = "", scalar = 1, output_shape = None):
+    '''Prepare mask segmentaion from im_id and optional dictory path.
     If directory path is not passed, the whole filepath, including filetype notation, 
-    should be given as im_id. If parameter scalar is passed, output image will be scaled by it. 
-    Defualt 1 retains original size.
+    should be given as im_id. 
+    If parameter scalar is passed, output image will be scaled by it. Defualt 1 retains original size.
+    If parameter output_shape is passed_ output image will be resized to it. Defualt None retains original size.
     
     Args:
         im_id (str): image ID
-        gt_dir_path (str, optional): ground truth directory path
+        mask_dir_path (str, optional): mask directory path
         scalar (float, optional): rescale coefficient
+        output_shape (tuple, optional): resize tuple
 
     Returns:
-        gt (numpy.ndarray): ground truth segmentation.
+        mask (numpy.ndarray): mask segmentation.
     '''
 
     # Read and resize image
-    if gt_dir_path == "":
-        gt = plt.imread(im_id) #Some images have fourth, empty color chanel which we slice of here
+    if mask_dir_path == "":
+        mask = plt.imread(im_id) #Some images have fourth, empty color chanel which we slice of here
     else:
-        gt = plt.imread(gt_dir_path + im_id + "_GT.png")
-    gt = rescale(gt, scalar, anti_aliasing=False)
-    if output_shape != None:
-        gt = resize(gt, output_shape)
+        mask = plt.imread(mask_dir_path + im_id[:-4] + "_mask.png")
+    mask = rescale(mask, scalar, anti_aliasing=False)
+    if output_shape != None and scalar == 1:
+        mask = resize(mask, output_shape)
 
-    # Return GT to binary
-    binary_gt = np.zeros_like(gt)
-    binary_gt[gt > .5] = 1
-    gt = binary_gt.astype(int)
+    # Return mask to binary
+    binary_gt = np.zeros_like(mask)
+    binary_gt[mask > .5] = 1
+    mask = binary_gt.astype(int)
 
-    return gt
+    return mask
