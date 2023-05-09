@@ -23,7 +23,7 @@ def convexity_score(mask):
     lesion_area = np.count_nonzero(mask)
 
     # Compute area of convex hull
-    convex_hull_area = hull.volume
+    convex_hull_area = hull.volume + hull.area
 
     # Compute convexity as ratio of convex hull area to lesion area
     convexity = lesion_area / convex_hull_area
