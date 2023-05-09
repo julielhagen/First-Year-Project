@@ -3,7 +3,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
-from modules.cut import cut_im_by_mask
+from cut import cut_im_by_mask
 
 def color_dominance(image, mask, clusters = 1):
     '''Get the most dominent colors of the cut image that closest sorrounds the lesion

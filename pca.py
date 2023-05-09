@@ -1,15 +1,15 @@
+# Imports
 import numpy as np
+import matplotlib.pyplot as plt
+import os
 from PIL import Image
 from sklearn.decomposition import PCA
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 from os import listdir
 from os.path import isfile, join
-import os
 from skimage.transform import resize, rescale
-import matplotlib.pyplot as plt
 from prep_image import prep_im
-
 
 # Load images
 image_folder_path = "imgs_part_1"
