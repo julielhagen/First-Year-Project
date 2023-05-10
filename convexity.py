@@ -1,7 +1,19 @@
-# Imports
+### Convexity module. Computes convexity score based on convex hull
+
+#***************
+#*** IMPORTS ***
+#***************
+
+# Standard modules
 import numpy as np
 import matplotlib.pyplot as plt
+
+# Image processing
 from scipy.spatial import ConvexHull
+
+#*****************
+#*** CONVEXITY ***
+#*****************
 
 def convexity_score(mask):
     '''Calculate convexity score between 0 and 1, 
@@ -31,7 +43,11 @@ def convexity_score(mask):
     
     return round(1-convexity, 3)
 
-def show_convex_hull(mask):
+#****************
+#*** PLOTTING ***
+#****************
+
+def plot_convex_hull(mask):
     '''Plot mask with convex hull.
     Mask is plotted with its red convex hull line.
 

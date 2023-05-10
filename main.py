@@ -1,6 +1,8 @@
-***************
-*** IMPORTS ***
-***************
+### UNFINISHED !!!
+
+#***************
+#*** IMPORTS ***
+#***************
 
 import os
 from os.path import isfile, join
@@ -36,18 +38,19 @@ for im_path in paths:
 
 features = ['image_id', 'assymmetry', 'color_r', 'color_g', 'color_b', 'compactness', 'convexity', 'cancer_type']
 
-**************************
-*** FEATURE EXTRACTION ***
-**************************
+#**************************
+#*** FEATURE EXTRACTION ***
+#**************************
+
 def extract_features():
 
 	return assymmetry, color_r, color_g, color_b, compactness, convexity
 
 
 
-******************
-*** Classifier ***
-******************
+#******************
+#*** CLASSIFIER ***
+#******************
 
 # Train classifier
 

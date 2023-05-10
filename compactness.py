@@ -1,13 +1,28 @@
-# Imports
-import matplotlib.pyplot as plt
+### Compactness Module. Computes a compactness score for a given mask
+### using the Polsby-Popper measure.
+
+#***************
+#*** IMPORTS ***
+#***************
+
+# Standard modules
 import numpy as np
+import matplotlib.pyplot as plt
+
+# Image processing
 from skimage import morphology
+
+# Pi
 from math import pi
+
+#*******************
+#*** COMPACTNESS ***
+#*******************
 
 def compactness_score(mask):
     '''Computes a compactness score for the given mask.
     The score is based of the Polsby-Popper measure. 
-    The score falls between the value 0 and 1. And a score closer to 1 indicates a more compact mask.
+    The score falls between the value 0 and 1. Scores closer to 1 indicates a more compact mask.
 
     Args:
         mask (numpy.ndarray): input masked image
@@ -36,6 +51,10 @@ def compactness_score(mask):
     score = round(1-compactness, 3)
 
     return score
+
+#****************
+#*** PLOTTING ***
+#****************
 
 def show_border(mask):
     '''Plot of the given mask's border i.e. it's perimeter.
