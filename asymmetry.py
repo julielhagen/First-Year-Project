@@ -69,7 +69,6 @@ def rotation_asymmetry(mask, n: int):
     Returns:
         asymmetry_scores (dict): dict of asymmetry scores calculated from each rotation.    
     '''
-
     asymmetry_scores = {}
 
     for i in range(n):

@@ -2,6 +2,7 @@
 import numpy as np
 from statistics import variance, stdev
 from skimage.segmentation import slic
+from skimage.color import rgb2hsv
 
 def segments(image, mask, n_segments = 50, compactness = 0.1):
     '''Get color segments of lesion from SLIC algorithm. 
@@ -29,7 +30,7 @@ def segments(image, mask, n_segments = 50, compactness = 0.1):
     
     return slic_segments
 
-def rgb_means_get(image, slic_segments):
+def get_rgb_means(image, slic_segments):
     '''Get mean RGB values for each segment in a SLIC segmented image.
 
     Args:
@@ -56,7 +57,7 @@ def rgb_means_get(image, slic_segments):
         
     return rgb_means
 
-def color_var(image, mask, n_segments = 50, compactness = .1):
+def rgb_var(image, mask, n_segments = 50, compactness = .1):
     '''Segment image by color using SLIC segmentation and get variance
     of the mean color values of each segment for red, green and blue channels. 
 
@@ -74,7 +75,7 @@ def color_var(image, mask, n_segments = 50, compactness = .1):
     '''
 
     slic_segments = segments(image, mask, n_segments, compactness)
-    rgb_means = rgb_means_get(image, slic_segments)
+    rgb_means = get_rgb_means(image, slic_segments)
 
     # If there is only 1 slic segment, return (0, 0, 0)
     if len(np.unique(slic_segments)) == 2:
@@ -101,7 +102,7 @@ def color_var(image, mask, n_segments = 50, compactness = .1):
 
     return red_var, green_var, blue_var
 
-def color_sd(image, mask, n_segments = 50, compactness = .1):
+def rgb_sd(image, mask, n_segments = 50, compactness = .1):
     '''Segment image by color using SLIC segmentation and get standard deviation
     of the mean color values of each segment for red, green and blue channels.
 
@@ -119,7 +120,7 @@ def color_sd(image, mask, n_segments = 50, compactness = .1):
     '''
 
     slic_segments = segments(image, mask, n_segments, compactness)
-    rgb_means = rgb_means_get(image, slic_segments)
+    rgb_means = get_rgb_means(image, slic_segments)
 
     # If there is only 1 slic segment, return (0, 0, 0)
     if len(np.unique(slic_segments)) == 2:
