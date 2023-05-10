@@ -13,9 +13,9 @@ def midpoint(mask):
 
 def plot_midpoint(mask):
     '''Cut mask and plot midpoint.'''
-    cut_mask = cut_mask(mask)
-    y, x = midpoint(cut_mask)
-    plt.imshow(cut_mask, cmap="gray")
+    cutted_mask = cut_mask(mask)
+    y, x = midpoint(cutted_mask)
+    plt.imshow(cutted_mask, cmap="gray")
     plt.axvline(x = x, color = "r")
     plt.axhline(y = y, color = "r")
 
@@ -77,9 +77,9 @@ def rotation_asymmetry(mask, n: int):
         degrees = 90 * i / n
 
         rotated_mask = rotate(mask, degrees)
-        cut_mask = cut_mask(rotated_mask)
+        cutted_mask = cut_mask(rotated_mask)
 
-        asymmetry_scores[degrees] = asymmetry(cut_mask)
+        asymmetry_scores[degrees] = asymmetry(cutted_mask)
 
     return asymmetry_scores
 
