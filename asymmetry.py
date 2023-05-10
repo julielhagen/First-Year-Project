@@ -1,38 +1,9 @@
+# Imports
 import numpy as np
 import matplotlib.pyplot as plt
 from math import floor, ceil
 from scipy.ndimage import rotate
-
-def cut_edges(mask):
-    '''Cut empty space from mask array such that it has smallest possible dimensions
-
-    Args:
-        mask (numpy.ndarray): mask to cut
-
-    Returns:
-        cut_mask (numpy.ndarray): cut mask    
-    '''
-    col_sums = np.sum(mask, axis=0)
-    row_sums = np.sum(mask, axis=1)
-
-    active_cols = []
-    for index, col_sum in enumerate(col_sums):
-        if col_sum != 0:
-            active_cols.append(index)
-
-    active_rows = []
-    for index, row_sum in enumerate(row_sums):
-        if row_sum != 0:
-            active_rows.append(index)
-
-    col_min = active_cols[0]
-    col_max = active_cols[-1]
-    row_min = active_rows[0]
-    row_max = active_rows[-1]
-
-    cut_mask = mask[row_min:row_max, col_min:col_max]
-
-    return cut_mask
+from cut import cut_mask
 
 def midpoint(mask):
     '''Find midpoint of mask array.'''
@@ -42,7 +13,7 @@ def midpoint(mask):
 
 def plot_midpoint(mask):
     '''Cut mask and plot midpoint.'''
-    cut_mask = cut_edges(mask)
+    cut_mask = cut_mask(mask)
     y, x = midpoint(cut_mask)
     plt.imshow(cut_mask, cmap="gray")
     plt.axvline(x = x, color = "r")
@@ -106,7 +77,7 @@ def rotation_asymmetry(mask, n: int):
         degrees = 90 * i / n
 
         rotated_mask = rotate(mask, degrees)
-        cut_mask = cut_edges(rotated_mask)
+        cut_mask = cut_mask(rotated_mask)
 
         asymmetry_scores[degrees] = asymmetry(cut_mask)
 

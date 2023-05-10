@@ -1,6 +1,7 @@
+# Imports
 import numpy as np
-from scipy.spatial import ConvexHull
 import matplotlib.pyplot as plt
+from scipy.spatial import ConvexHull
 
 def convexity_score(mask):
     '''Calculate convexity score between 0 and 1, 
