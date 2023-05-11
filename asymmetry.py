@@ -4,9 +4,9 @@
 ### computes the asymmetry for different angles by rotating the image
 ### (Corresponds to rotating the x- and y-axes).
 
-#***************
-#*** IMPORTS ***
-#***************
+###############
+### IMPORTS ###
+###############
 
 # Standard modules
 import numpy as np
@@ -19,9 +19,9 @@ from scipy.ndimage import rotate
 # Own modules
 from cut import cut_mask
 
-#****************
-#*** MIDPOINT ***
-#****************
+################
+### MIDPOINT ###
+################
 
 def midpoint(image):
     '''Find midpoint of image array.'''
@@ -29,9 +29,9 @@ def midpoint(image):
     col_mid = image.shape[1] / 2
     return row_mid, col_mid
 
-#*****************************
-#*** ASYMMETRY COMPUTATION ***
-#*****************************
+#############################
+### ASYMMETRY COMPUTATION ###
+#############################
 
 def asymmetry(mask):
     '''Calculate asymmetry score between 0 and 1 from vertical and horizontal axis
@@ -96,9 +96,9 @@ def rotation_asymmetry(mask, n: int):
 
     return asymmetry_scores
 
-#******************************
-#*** FEATURE OUTPUT CHOICES ***
-#******************************
+##############################
+### FEATURE OUTPUT CHOICES ###
+##############################
 
 def best_asymmetry(mask, rotations = 30):
     '''Return best (lowest) asymmetry score from mask.
@@ -148,9 +148,9 @@ def mean_asymmetry(mask, rotations = 30):
 
     return mean_score
 
-#****************
-#*** PLOTTING ***
-#****************
+################
+### PLOTTING ###
+################
 
 def plot_midpoint(mask):
     '''Cut mask and plot midpoint.'''

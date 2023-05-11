@@ -3,9 +3,9 @@
 ### or standard deviation between these means, either in RGB or HSV color space.
 ### Second part (dominance) uses KMeans to compute dominant colors from HSV color space.
 
-#***************
-#*** IMPORTS ***
-#***************
+################
+#### IMPORTS ###
+################
 
 # Standard modules
 import numpy as np
@@ -24,9 +24,9 @@ from sklearn.cluster import KMeans
 # Own modules
 from cut import cut_im_by_mask
 
-#******************************
-#** SLIC COLOR SEGMENTATION ***
-#******************************
+###############################
+### SLIC COLOR SEGMENTATION ###
+###############################
 
 def slic_segmentation(image, mask, n_segments = 50, compactness = 0.1):
     '''Get color segments of lesion from SLIC algorithm. 
@@ -54,9 +54,9 @@ def slic_segmentation(image, mask, n_segments = 50, compactness = 0.1):
     
     return slic_segments
 
-#*****************************
-#** EXTRACTING COLOR MEANS ***
-#*****************************
+##############################
+### EXTRACTING COLOR MEANS ###
+##############################
 
 def get_rgb_means(image, slic_segments):
     '''Get mean RGB values for each segment in a SLIC segmented image.
@@ -118,9 +118,9 @@ def get_hsv_means(image, slic_segments):
         
     return hsv_means
 
-#***************
-#** VARIANCE ***
-#***************
+################
+### VARIANCE ###
+################
 
 def rgb_var(image, slic_segments):
     '''Get variance of RGB means for each segment in 
@@ -196,9 +196,9 @@ def hsv_var(image, slic_segments):
 
     return hue_var, sat_var, val_var
 
-#*************************
-#** STANDARD DEVIATION ***
-#*************************
+##########################
+### STANDARD DEVIATION ###
+##########################
 
 def rgb_sd(image, slic_segments):
     '''Get standard deviation of RGB means for each segment in 
@@ -274,9 +274,9 @@ def hsv_sd(image, slic_segments):
 
     return hue_sd, sat_sd, val_sd
 
-#***********************
-#*** COLOR DOMINANCE ***
-#***********************
+#######################
+### COLOR DOMINANCE ###
+#######################
 
 def color_dominance(image, mask, clusters = 3, include_percentages = False):
     '''Get the most dominent colors of the cut image that closest sorrounds the lesion using KMeans

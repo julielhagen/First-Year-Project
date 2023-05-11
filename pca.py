@@ -1,8 +1,8 @@
 ### PCA Module. Used to .... (this part is written when module is done)
 
-#***************
-#*** IMPORTS ***
-#***************
+###############
+### IMPORTS ###
+###############
 
 # Standard modules
 import numpy as np
@@ -36,9 +36,9 @@ for im_path in paths:
   arr = np.asarray(image)
   images.append(arr)
 
-#*************************
-#*** IMAGE PREPARATION ***
-#*************************
+#########################
+### IMAGE PREPARATION ###
+#########################
 
 # Load labels for images
 data = np.array([i.strip().split(',') for i in open('metadata.csv')])
@@ -55,9 +55,9 @@ dim1, dim2, chan = arr.shape
 n_features = chan*dim1*dim2
 X = X.reshape((len(images), n_features)) # flattened --> this goes to PCA 
 
-#*****************
-#*** PCA MODEL ***
-#*****************
+#################
+### PCA MODEL ###
+#################
 
 # Init the model (a.k.a. specify the hyper-parameters e.g. number of components)
 final_n_features = 10 # Hyper-parameter - try different values
@@ -71,9 +71,9 @@ X_train_transformed = pca.fit_transform(X_train) # X_new has final_n_features --
 
 X_test_transformed = pca.fit_transform(X_test) # X_new has final_n_features --> this can be fed to the classfier model
 
-#******************
-#*** CLASSIFIER ***
-#******************
+##################
+### CLASSIFIER ###
+##################
 
 # Define a classifer
 clf = KNeighborsClassifier(n_neighbors=10)
