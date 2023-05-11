@@ -1,8 +1,8 @@
 ### Convexity module. Computes convexity score based on convex hull
 
-#***************
-#*** IMPORTS ***
-#***************
+###############
+### IMPORTS ###
+###############
 
 # Standard modules
 import numpy as np
@@ -11,9 +11,9 @@ import matplotlib.pyplot as plt
 # Image processing
 from scipy.spatial import ConvexHull
 
-#*****************
-#*** CONVEXITY ***
-#*****************
+#################
+### CONVEXITY ###
+#################
 
 def convexity_score(mask):
     '''Calculate convexity score between 0 and 1, 
@@ -38,14 +38,14 @@ def convexity_score(mask):
     # Compute area of convex hull
     convex_hull_area = hull.volume + hull.area
 
-    # Compute convexity as ratio of convex hull area to lesion area
+    # Compute convexity as ratio of lesion area to convex hull
     convexity = lesion_area / convex_hull_area
     
     return round(1-convexity, 3)
 
-#****************
-#*** PLOTTING ***
-#****************
+################
+### PLOTTING ###
+################
 
 def plot_convex_hull(mask):
     '''Plot mask with convex hull.
