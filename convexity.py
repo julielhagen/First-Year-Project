@@ -1,8 +1,21 @@
+### Convexity module. Computes convexity score based on convex hull
+
+#***************
+#*** IMPORTS ***
+#***************
+
+# Standard modules
 import numpy as np
-from scipy.spatial import ConvexHull
 import matplotlib.pyplot as plt
 
-def convexity(mask):
+# Image processing
+from scipy.spatial import ConvexHull
+
+#*****************
+#*** CONVEXITY ***
+#*****************
+
+def convexity_score(mask):
     '''Calculate convexity score between 0 and 1, 
     with 0 indicating a smoother border and 1 a more crooked border.
 
@@ -23,14 +36,18 @@ def convexity(mask):
     lesion_area = np.count_nonzero(mask)
 
     # Compute area of convex hull
-    convex_hull_area = hull.volume
+    convex_hull_area = hull.volume + hull.area
 
     # Compute convexity as ratio of lesion area to convex hull
     convexity = lesion_area / convex_hull_area
     
     return round(1-convexity, 3)
 
-def show_convex_hull(mask):
+#****************
+#*** PLOTTING ***
+#****************
+
+def plot_convex_hull(mask):
     '''Plot mask with convex hull.
     Mask is plotted with its red convex hull line.
 
@@ -40,6 +57,12 @@ def show_convex_hull(mask):
     Returns:
         plot: plot including mask and convex hull boundary.
     '''
+
+    # Get coordinates of all pixels in the lesion mask
+    coords = np.transpose(np.nonzero(mask))
+
+    # Compute convex hull of lesion pixels
+    hull = ConvexHull(coords)
 
     plt.imshow(mask, cmap='gray')
 
