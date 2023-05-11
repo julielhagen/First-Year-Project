@@ -1,9 +1,9 @@
 ### Compactness Module. Computes a compactness score for a given mask
 ### using the Polsby-Popper measure.
 
-#***************
-#*** IMPORTS ***
-#***************
+###############
+### IMPORTS ###
+###############
 
 # Standard modules
 import numpy as np
@@ -15,9 +15,9 @@ from skimage import morphology
 # Pi
 from math import pi
 
-#*******************
-#*** COMPACTNESS ***
-#*******************
+###################
+### COMPACTNESS ###
+###################
 
 def compactness_score(mask):
     '''Computes a compactness score for the given mask.
@@ -52,9 +52,9 @@ def compactness_score(mask):
 
     return score
 
-#****************
-#*** PLOTTING ***
-#****************
+################
+### PLOTTING ###
+################
 
 def show_border(mask):
     '''Plot of the given mask's border i.e. it's perimeter.
