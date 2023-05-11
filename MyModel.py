@@ -1,18 +1,15 @@
-#***************
-#*** IMPORTS ***
-#***************
+### Main model script ... Finish this part when script is done ...
+
+###############
+### IMPORTS ###
+###############
+
+# Standard Modules
 import os
 from os.path import isfile, join
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-
-from prep_image import prep_im_and_mask
-
-from asymmetry import mean_asymmetry
-from color import slic_segmentation, rgb_var, hsv_var #, color_dominance
-from compactness import compactness_score
-from convexity import convexity_score
 
 # Default packages for the minimum example
 from sklearn.neighbors import KNeighborsClassifier
@@ -22,30 +19,47 @@ from sklearn.metrics import accuracy_score #example for measuring performance
 # For saving/loading trained classifiers
 import pickle
 
-#***************************
-#*** FEATURE EXTRACTIONS ***
-#***************************
+# Image preperation
+from prep_image import prep_im_and_mask
+
+# Feature extraction
+from asymmetry import mean_asymmetry
+from color import slic_segmentation, rgb_var, hsv_var, color_dominance
+from compactness import compactness_score
+from convexity import convexity_score
+
+###########################
+### FEATURE EXTRACTIONS ###
+###########################
+
 def extract_features(im, im_mask):
-    
-    # Assymmetry
-    asymmetry = mean_asymmetry(im_mask,4)
-    
-    # Color
-    segments = slic_segmentation(im, im_mask)
-    col_r, col_g, col_b = rgb_var(im, segments)
-    
-    # Compactness
-    compactness = compactness_score(im_mask)
-    
-    # Convexity
-    convexity = convexity_score(im_mask)
-    
-    return np.array([asymmetry, col_r, col_g, col_b, compactness, convexity], dtype=np.float16)
+
+	# Assymmetry
+	asymmetry = mean_asymmetry(im_mask,4)
+
+	# Color variance
+	segments = slic_segmentation(im, im_mask)
+	red_var, green_var, blue_var = rgb_var(im, segments)
+	hue_var, sat_var, val_var = hsv_var(im, segments)
+
+	# Color dominance
+	dom_colors = color_dominance(im, im_mask, clusters=5, include_percentages=True) # Extract five most dominent colors, sorted by percentage of total area
+	dom_hue, dom_sat, dom_val = dom_colors[0][1]     
+
+	# Compactness
+	compactness = compactness_score(im_mask)
+
+	# Convexity
+	convexity = convexity_score(im_mask)
+
+	return np.array([asymmetry, red_var, green_var, blue_var, \
+		hue_var, sat_var, val_var, dom_hue, dom_sat, dom_val, \
+		compactness, convexity], dtype=np.float16)
 
 
-#************************
-#*** IMAGE PROCESSING ***
-#************************
+########################
+### IMAGE PROCESSING ###
+########################
 
 def ProcessImages(file_data, image_folder, mask_folder, file_features):
 	# Import metadata from file
@@ -56,7 +70,9 @@ def ProcessImages(file_data, image_folder, mask_folder, file_features):
 	df = df.loc[df_mask]
 
 	# Features to extract
-	feature_names = ['assymmetry', 'color_r', 'color_g', 'color_b', 'compactness', 'convexity']
+	feature_names = ['assymmetry', 'red_var', 'green_var', 'blue_var', \
+		'hue_var', 'sat_var', 'val_var', 'dom_hue', 'dom_sat', 'dom_val', \
+		'compactness', 'convexity']
 	features_n = len(feature_names)
 	
 	features = np.zeros(shape = [len(df), features_n], dtype = np.float16)
@@ -64,29 +80,29 @@ def ProcessImages(file_data, image_folder, mask_folder, file_features):
 	# Extract features
 	images = []
 	for i, id in enumerate(list(df['img_id'])):
-	    
-	    im, mask = prep_im_and_mask(id, image_folder, mask_folder)
-	    images.append(im)
+	
+		im, mask = prep_im_and_mask(id, image_folder, mask_folder)
+		images.append(im)
 
-	    # Extract features
-	    x = extract_features(im, mask)
-	    features[i,:] = x
+		# Extract features
+		x = extract_features(im, mask)
+		features[i,:] = x
 
 	# Save image_ids and features in a file
 	df_features = pd.DataFrame(features, columns = feature_names)
 	df_features.to_csv(file_features, index = False)
 
-
 #########################
 ### FEATURE SELECTION ###
 #########################
 
-
+# ... Put something here ...
 
 ##########################
 ### FEATURE EXTRACTION ###
 ##########################
 
+# ... Put something here ...
 
 ########################
 ### TRAIN CLASSIFIER ###
@@ -105,14 +121,15 @@ def train_classifier():
 	labels = np.array(df['diagnostic'])
 
 	# Extract features
-	feature_names = ['assymmetry', 'color_r', 'color_g', 'color_b', 'compactness', 'convexity']
+	feature_names = ['assymmetry', 'red_var', 'green_var', 'blue_var', \
+		'hue_var', 'sat_var', 'val_var', 'dom_hue', 'dom_sat', 'dom_val', \
+		'compactness', 'convexity']
 	df_features = pd.read_csv(file_features)
 
 	# Make dataset
 	X = np.array(df_features[feature_names])
-	y =  (labels == 'BCC') | (labels == 'SCC') | (labels == 'MEL')
+	y = (labels == 'BCC') | (labels == 'SCC') | (labels == 'MEL')
 	patient_id = df['patient_id']
-
 
 	# Train-test split
 	num_folds = 5
@@ -138,16 +155,15 @@ def train_classifier():
 	#for i, (train_index, val_index) in enumerate(group_kfold.split(X, y, patient_id)):
 	for i, (train_index, val_index) in enumerate(skf.split(X, y, patient_id)):
 
-	    X_train = X[train_index,:]
-	    y_train = y[train_index]
-	    X_val = X[val_index,:]
-	    y_val = y[val_index]
-	    
-	    
-	    for j, clf in enumerate(classifiers): 
-	        
-	        #Train the classifier
-	        clf.fit(X_train,y_train)
-	    
-	        #Evaluate your metric of choice (accuracy is probably not the best choice)
-	        acc_val[i,j] = accuracy_score(y_val, clf.predict(X_val))
+		X_train = X[train_index,:]
+		y_train = y[train_index]
+		X_val = X[val_index,:]
+		y_val = y[val_index]
+	
+		for j, clf in enumerate(classifiers): 
+	
+			#Train the classifier
+			clf.fit(X_train,y_train)
+	
+			#Evaluate your metric of choice (accuracy is probably not the best choice)
+			acc_val[i,j] = accuracy_score(y_val, clf.predict(X_val))
