@@ -28,6 +28,10 @@ from color import slic_segmentation, rgb_var, hsv_var, color_dominance
 from compactness import compactness_score
 from convexity import convexity_score
 
+# Feature extraction (PCA)
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
 ###########################
 ### FEATURE EXTRACTIONS ###
 ###########################
@@ -102,7 +106,24 @@ def ProcessImages(file_data, image_folder, mask_folder, file_features):
 ### FEATURE EXTRACTION ###
 ##########################
 
-# ... Put something here ...
+def PCA_(X, n: int):
+    '''Using PCA to extract features from X, down to n features as output. 
+    The features in X are first standardized, then
+
+    Args:
+        X (pandas.DataFrame): Data Frame of features.
+        n (int): Number of features to keep.
+
+    Returns:
+        X_std_pca (numpy.ndarray): Array containg n standardized features.    
+    '''
+
+    std_slc = StandardScaler()
+    X_std = std_slc.fit_transform(X)
+    
+    pca = PCA(n_components=n)
+    X_std_pca = pca.fit_transform(X_std)
+    return X_std_pca
 
 ########################
 ### TRAIN CLASSIFIER ###
