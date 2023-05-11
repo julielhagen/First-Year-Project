@@ -1,3 +1,5 @@
+### Image preparation module. Used to prepare images for feature extraction.
+
 # Imports
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,7 +20,7 @@ def prep_im_and_mask(im_id, im_dir_path, mask_dir_path, scalar = 1, output_shape
 
     Returns:
         im (numpy.ndarray): image
-        gt (numpy.ndarray): mask segmentation.
+        mask (numpy.ndarray): mask segmentation.
     '''
 
     # Read and resize image
@@ -34,9 +36,9 @@ def prep_im_and_mask(im_id, im_dir_path, mask_dir_path, scalar = 1, output_shape
         mask = resize(mask, output_shape)
 
     #Return mask to binary
-    binary_gt = np.zeros_like(mask)
-    binary_gt[mask > .5] = 1
-    mask = binary_gt.astype(int)
+    binary_mask = np.zeros_like(mask)
+    binary_mask[mask > .5] = 1
+    mask = binary_mask.astype(int)
 
     return im, mask
 
@@ -95,8 +97,8 @@ def prep_mask(im_id, mask_dir_path = "", scalar = 1, output_shape = None):
         mask = resize(mask, output_shape)
 
     # Return mask to binary
-    binary_gt = np.zeros_like(mask)
-    binary_gt[mask > .5] = 1
-    mask = binary_gt.astype(int)
+    binary_mask = np.zeros_like(mask)
+    binary_mask[mask > .5] = 1
+    mask = binary_mask.astype(int)
 
     return mask

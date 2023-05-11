@@ -1,3 +1,5 @@
+### Helper cut module. Used to cut excess pixels around image or mask.
+
 # Imports
 import numpy as np
 
@@ -28,7 +30,7 @@ def cut_mask(mask):
     row_min = active_rows[0]
     row_max = active_rows[-1]
 
-    cut_mask_ = mask[row_min:row_max, col_min:col_max]
+    cut_mask_ = mask[row_min:row_max+1, col_min:col_max+1]
 
     return cut_mask_
 
@@ -61,7 +63,7 @@ def cut_im_by_mask(image, mask):
     row_min = active_rows[0]
     row_max = active_rows[-1]
 
-    cut_image = image[row_min:row_max, col_min:col_max]
+    cut_image = image[row_min:row_max+1, col_min:col_max+1]
 
     return cut_image
 

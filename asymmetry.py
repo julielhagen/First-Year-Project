@@ -1,28 +1,42 @@
-# Imports
+### Asymmetry module. Used to compute asymmetry features. 
+### Folds the mask vertically and horizontally around its midpoint and 
+### computes the areas which are True under xor logic operation. Further
+### computes the asymmetry for different angles by rotating the image
+### (Corresponds to rotating the x- and y-axes).
+
+#***************
+#*** IMPORTS ***
+#***************
+
+# Standard modules
 import numpy as np
 import matplotlib.pyplot as plt
+
+# Operations
 from math import floor, ceil
 from scipy.ndimage import rotate
+
+# Own modules
 from cut import cut_mask
 
-def midpoint(mask):
-    '''Find midpoint of mask array.'''
-    row_mid = mask.shape[0] / 2
-    col_mid = mask.shape[1] / 2
+#****************
+#*** MIDPOINT ***
+#****************
+
+def midpoint(image):
+    '''Find midpoint of image array.'''
+    row_mid = image.shape[0] / 2
+    col_mid = image.shape[1] / 2
     return row_mid, col_mid
 
-def plot_midpoint(mask):
-    '''Cut mask and plot midpoint.'''
-    cutted_mask = cut_mask(mask)
-    y, x = midpoint(cutted_mask)
-    plt.imshow(cutted_mask, cmap="gray")
-    plt.axvline(x = x, color = "r")
-    plt.axhline(y = y, color = "r")
+#*****************************
+#*** ASYMMETRY COMPUTATION ***
+#*****************************
 
 def asymmetry(mask):
     '''Calculate asymmetry score between 0 and 1 from vertical and horizontal axis
-    on a binary mask, 0 being complete symmetry, 1 being complete asymmetry 
-    (no pixels overlap when folding mask on x- and y-axis)
+    on a binary mask, 0 being complete symmetry, 1 being complete asymmetry, 
+    i.e. no pixels overlapping when folding mask on x- and y-axis
 
     Args:
         mask (numpy.ndarray): input mask
@@ -69,7 +83,6 @@ def rotation_asymmetry(mask, n: int):
     Returns:
         asymmetry_scores (dict): dict of asymmetry scores calculated from each rotation.    
     '''
-
     asymmetry_scores = {}
 
     for i in range(n):
@@ -83,18 +96,17 @@ def rotation_asymmetry(mask, n: int):
 
     return asymmetry_scores
 
-def plot_asymmetry(mask, rotations = 90):
-    '''Plot asymmetry scores for each degree in steps 90/rotations.'''
-    asymmetry_scores = rotation_asymmetry(mask, rotations)
-    plt.scatter(asymmetry_scores.keys(), asymmetry_scores.values())
+#******************************
+#*** FEATURE OUTPUT CHOICES ***
+#******************************
 
-def best_asymmetry(mask, rotations = 90):
+def best_asymmetry(mask, rotations = 30):
     '''Return best (lowest) asymmetry score from mask.
-    Optional argument (defualt 90) rotations decides amount of rotations in asymmetry calculation
+    Optional argument (defualt 30) rotations decides amount of rotations in asymmetry calculation
     
     Args:
         mask (numpy.ndarray): mask to compute asymmetry score for
-        rotations (int, optional): amount of rotations
+        rotations (int, optional): amount of rotations (defualt 30)
 
     Returns:
         best_score (float): best asymmetry score.
@@ -104,13 +116,13 @@ def best_asymmetry(mask, rotations = 90):
 
     return best_score
 
-def worst_asymmetry(mask, rotations = 90):
+def worst_asymmetry(mask, rotations = 30):
     '''Return worst (highest) asymmetry score from mask.
-    Optional argument (defualt 90) rotations decides amount of rotations in asymmetry calculation
+    Optional argument (defualt 30) rotations decides amount of rotations in asymmetry calculation
     
     Args:
         mask (numpy.ndarray): mask to compute asymmetry score for
-        rotations (int, optional): amount of rotations
+        rotations (int, optional): amount of rotations (defualt 30)
 
     Returns:
         worst_score (float): worst asymmetry score.
@@ -120,13 +132,13 @@ def worst_asymmetry(mask, rotations = 90):
 
     return worst_score
 
-def mean_asymmetry(mask, rotations = 90):
+def mean_asymmetry(mask, rotations = 30):
     '''Return mean asymmetry score from mask.
-    Optional argument (defualt 90) rotations decides amount of rotations in asymmetry calculation
+    Optional argument (defualt 30) rotations decides amount of rotations in asymmetry calculation
     
     Args:
         mask (numpy.ndarray): mask to compute asymmetry score for
-        rotations (int, optional): amount of rotations
+        rotations (int, optional): amount of rotations (defualt 30)
 
     Returns:
         mean_score (float): mean asymmetry score.
@@ -135,3 +147,20 @@ def mean_asymmetry(mask, rotations = 90):
     mean_score = sum(asymmetry_scores.values()) / len(asymmetry_scores)
 
     return mean_score
+
+#****************
+#*** PLOTTING ***
+#****************
+
+def plot_midpoint(mask):
+    '''Cut mask and plot midpoint.'''
+    cutted_mask = cut_mask(mask)
+    y, x = midpoint(cutted_mask)
+    plt.imshow(cutted_mask, cmap="gray")
+    plt.axvline(x = x, color = "r")
+    plt.axhline(y = y, color = "r")
+
+def plot_asymmetry(mask, rotations = 90):
+    '''Plot asymmetry scores for each degree in 90/rotations steps.'''
+    asymmetry_scores = rotation_asymmetry(mask, rotations)
+    plt.scatter(asymmetry_scores.keys(), asymmetry_scores.values())
