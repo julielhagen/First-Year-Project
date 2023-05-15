@@ -50,7 +50,7 @@ def extract_features(im, im_mask):
 	hue_var, sat_var, val_var = hsv_var(im, segments)
 
 	# Color dominance
-	dom_colors = color_dominance(im, im_mask, clusters=5, include_percentages=True) # Extract five most dominent colors, sorted by percentage of total area
+	dom_colors = color_dominance(im, im_mask, clusters=5, include_ratios=True) # Extract five most dominent colors, sorted by percentage of total area
 	dom_hue, dom_sat, dom_val = dom_colors[0][1]     
 
 	# Compactness
