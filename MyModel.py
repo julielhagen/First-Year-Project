@@ -59,9 +59,9 @@ def extract_features(im, im_mask):
 	# Convexity
 	convexity = convexity_score(im_mask)
 
-	return np.array([asymmetry, red_var, green_var, blue_var, \
+	return [asymmetry, red_var, green_var, blue_var, \
 		hue_var, sat_var, val_var, dom_hue, dom_sat, dom_val, \
-		compactness, convexity], dtype=np.float16)
+		compactness, convexity]
 
 
 ########################
@@ -77,25 +77,25 @@ def ProcessImages(file_data, image_folder, mask_folder, file_features):
 	df = df.loc[df_mask]
 
 	# Features to extract
-	feature_names = ['img_id', 'assymmetry', 'red_var', 'green_var', 'blue_var', \
+	feature_names = ['assymmetry', 'red_var', 'green_var', 'blue_var', \
 		'hue_var', 'sat_var', 'val_var', 'dom_hue', 'dom_sat', 'dom_val', \
 		'compactness', 'convexity']
 	features_n = len(feature_names)
 	
 	features = np.zeros(shape = [len(df), features_n], dtype = np.float16)
-
+	img_ids = []
 	# Extract features
 	for i, id in enumerate(list(df['img_id'])):
 		im, mask = prep_im_and_mask(id, image_folder, mask_folder)
-		print(f"Before for {id}")
 		# Extract features
 		x = extract_features(im, mask)
-		x.insert(0, id)
+		img_ids.append(id)
 		features[i,:] = x
-		print(f"After {id}")
+		print(f"Done {i+1} image out of {len(list(df['img_id'])) + 1} images")
 
 	# Save image_ids and features in a file
 	df_features = pd.DataFrame(features, columns = feature_names)
+	df_features.insert(0, 'img_id', img_ids)
 	df_features.to_csv(file_features, index = False)
 
 #########################
