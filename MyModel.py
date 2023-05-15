@@ -32,6 +32,9 @@ from convexity import convexity_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
+# Feature selection
+from sklearn.feature_selection import SelectKBest,mutual_info_classif
+
 ###########################
 ### FEATURE EXTRACTIONS ###
 ###########################
@@ -100,7 +103,26 @@ def ProcessImages(file_data, image_folder, mask_folder, file_features):
 ### FEATURE SELECTION ###
 #########################
 
-# ... Put something here ...
+def feature_scores(train_X, train_y, k):
+    '''Using SelectKBest to extract features from train_X, down to k features as output
+    Returns a selector object (which is applied to X_train and X_test afterwards) 
+	and the score for each feature.
+
+    Args:
+        train_X (pandas.DataFrame): Data Frame of features from X_train.
+		train_y (pandas.DataFrame): Data Frame of target values from y_train.
+        k (int): Number of features to output.
+
+    Returns:
+		feature_selector (selector object): 
+        scores (numpy.ndarray): Array containg scores for each feature.    
+    '''
+    feature_selector = SelectKBest(mutual_info_classif, k=k)
+    feature_selector.fit_transform(train_X, train_y)
+    
+    scores = feature_selector.scores_
+    
+    return feature_selector, scores
 
 ##########################
 ### FEATURE EXTRACTION ###
