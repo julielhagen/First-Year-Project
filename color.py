@@ -312,7 +312,7 @@ def color_dominance(image, mask, clusters = 5, include_ratios = False):
         ratios = counts / flat_im.shape[0] # Get percentage of total image for each dominent color
 
         r_and_c = zip(ratios, dom_colors) # Percentage and colors
-        r_and_c = sorted(r_and_c, reverse=True) # Sort in descending order
+        r_and_c = sorted(r_and_c, key=lambda x: x[0],reverse=True) # Sort in descending order
 
         return r_and_c
     
