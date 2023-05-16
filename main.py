@@ -15,7 +15,7 @@ from MyModel import ProcessImages
 
 file_data = 'metadata_withmasks.csv'
 image_folder = 'test_images' + os.sep
-mask_folder = 'test_images_masks' + os.sep
+mask_folder = 'test_images_mask' + os.sep
 file_features = 'feature_data.csv'
 
 ProcessImages(file_data, image_folder, mask_folder, file_features)

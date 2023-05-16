@@ -327,7 +327,7 @@ def plot_dominance_bar(r_and_c):
     plt.title('Proportions of Dominent Colors in the Image')
     start = 0
     i = 1
-    for percentage, color in p_and_c:
+    for percentage, color in r_and_c:
         end = start + int(percentage * bar.shape[1])
         if i == len(r_and_c):
             bar[:, start:] = color[::-1]
