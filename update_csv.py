@@ -7,7 +7,7 @@ from os import listdir, remove
 df = pd.read_csv('metadata.csv')
 
 # List of mask names
-mask_ids = listdir('test_images_masks')
+mask_ids = listdir('images_masks')
 
 # Update dataframe from masks in mask_ids
 for i, row in df.iterrows():
