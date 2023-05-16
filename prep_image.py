@@ -31,7 +31,12 @@ def prep_im_and_mask(im_id, im_dir_path, mask_dir_path, scalar = 1, output_shape
 
     #Read and resize mask segmentation
     mask = plt.imread(mask_dir_path + im_id[:-4] + "_mask.png")
+
+    if len(mask.shape) == 3:
+        mask = mask[:,:,0]
+
     mask = rescale(mask, scalar, anti_aliasing=False)
+    
     if output_shape != None and scalar == 1:
         mask = resize(mask, output_shape)
 
