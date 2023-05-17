@@ -13,8 +13,8 @@ import matplotlib.pyplot as plt
 
 # Default packages for the minimum example
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import GroupKFold, StratifiedShuffleSplit, StratifiedKFold, train_test_split
-from sklearn.metrics import accuracy_score #example for measuring performance
+from sklearn.model_selection import train_test_split, StratifiedGroupKFold, cross_validate
+from sklearn.metrics import accuracy_score, recall_score, precision_score, roc_auc_score #example for measuring performance
 
 # For saving/loading trained classifiers
 import pickle
@@ -84,19 +84,27 @@ def ProcessImages(file_data, image_folder, mask_folder, file_features):
 	
 	features = np.zeros(shape = [len(df), features_n], dtype = np.float16)
 	img_ids = []
+	
 	# Extract features
 	for i, id in enumerate(list(df['img_id'])):
 		im, mask = prep_im_and_mask(id, image_folder, mask_folder)
+		
 		# Extract features
 		x = extract_features(im, mask)
 		img_ids.append(id)
 		features[i,:] = x
 		print(f"Done {i+1} image out of {len(list(df['img_id'])) + 1} images")
 
-	# Save image_ids and features in a file
+	# Insert image ids
 	df_features = pd.DataFrame(features, columns = feature_names)
 	df_features.insert(0, 'img_id', img_ids)
+
+	# Insert patient ids
+	df_features.insert(0, 'patient_id', df['patient_id'].tolist())
+
+	# Save feature data as csv file
 	df_features.to_csv(file_features, index = False)
+
 
 #########################
 ### FEATURE SELECTION ###
@@ -127,7 +135,7 @@ def feature_scores(train_X, train_y, k):
 ### FEATURE EXTRACTION ###
 ##########################
 
-def PCA_(X, n: int):
+def PCA_(X):
     '''Using PCA to extract features from X, down to n features as output. 
     The features in X are first standardized, then
 
@@ -139,73 +147,153 @@ def PCA_(X, n: int):
         X_std_pca (numpy.ndarray): Array containg n standardized features.    
     '''
 
-    std_slc = StandardScaler()
-    X_std = std_slc.fit_transform(X)
+    X_std = std_X(X)
     
-    pca = PCA(n_components=n)
+    pca = PCA(n_components=0.95)
     X_std_pca = pca.fit_transform(X_std)
+
+    pk.dump(pca, open('pca.pkl', 'wb'))
+
     return X_std_pca
+
+# Standardize feature data
+def std_X(X):
+    '''Standardized the input.
+
+    Args:
+        X (pandas.DataFrame): Data Frame of features.
+
+    Returns:
+        X_std (numpy.ndarray): Array containg standardized features.    
+    '''
+
+	std_scl = StandardScaler()
+	X_std = std_scl.fit_transform(X)
+
+	return X_std
+
+def train_pca(X):
+	'''Train PCA. Save the result.
+
+	Args:
+	    X (pandas.DataFrame): Data Frame of features.
+	    n (float): Percentage of variation that should be explained by the chosen features.
+
+	Returns:
+		Nothing
+	'''
+
+	X_std =std_X(X)
+	pca = PCA(n_components=0.95)
+
+	pk.dump(pca, open('pca.pkl', 'wb'))
+
+def apply_pca(X):
+	'''Apply pca to X.
+
+	Args:
+	    X (pandas.DataFrame): Data Frame of features.
+	    n (float): Percentage of variation that should be explained by the chosen features.
+
+	Returns:
+	    X_std_pca (numpy.ndarray): Array containg transformed, standardized features.    
+	'''
+
+	pca = pk.load(open('pca.pkl', 'rb'))
+
+	X_std =std_X(X)
+	X_transformed = pca.transform(X_std)
+
+	return X_transformed
 
 ########################
 ### TRAIN CLASSIFIER ###
 ########################
 
-# def train_classifier():
+def cross_validate_clf(X, y, classifiers, groups):
 
-# 	# Extract metadata for images
-# 	df = pd.read_csv(file_data)
+	# Scores for evaluation
+	scores = ['accuracy', 'recall', 'precision', 'roc_auc']
 
-# 	# Remove images without masks
-# 	df_mask = df['mask'] == 1
-# 	df = df.loc[df_mask]
+	num_folds = 5
+	cross_val = StratifiedGroupKFold(n_splits= num_folds)	
 
-# 	# Extract labels
-# 	labels = np.array(df['diagnostic'])
+	evaluation_results = {}
+	for classifier in classifiers:
+        cv_results = cross_validate(classifier, X_train, y_train, scoring=scores, cv=cross_val, groups = groups)
 
-# 	# Extract features
-# 	feature_names = ['assymmetry', 'red_var', 'green_var', 'blue_var', \
-# 		'hue_var', 'sat_var', 'val_var', 'dom_hue', 'dom_sat', 'dom_val', \
-# 		'compactness', 'convexity']
-# 	df_features = pd.read_csv(file_features)
+        if type(classifier).__name__ == "KNeighborsClassifier":
+            classifier_name = type(classifier).__name__
+            params_dict = classifier.get_params()
+            n_neigbors = params_dict["n_neighbors"]
+            classifier_name = f"{classifier_name} with n_neighbors: {n_neigbors}"
+        else:
+            classifier_name = type(classifier).__name__
 
-# 	# Make dataset
-# 	X = np.array(df_features[feature_names])
-# 	y = (labels == 'BCC') | (labels == 'SCC') | (labels == 'MEL')
-# 	patient_id = df['patient_id']
+        evaluation_results[classifier_name] = {
+            'Accuracy': cv_results['test_accuracy'].mean(),
+            'Recall': cv_results['test_recall'].mean(),
+            'Precision': cv_results['test_precision'].mean(),
+            'ROC AUC': cv_results['test_roc_auc'].mean()
 
-# 	# Train-test split
-# 	num_folds = 5
-# 	group_kfold = GroupKFold(n_splits=num_folds)
-# 	group_kfold.get_n_splits(X, y, patient_id)
+        }
 
-# 	sss = StratifiedShuffleSplit(n_splits = num_folds)
-# 	sss.get_n_splits(X,y)
+    return evalutation_results
 
-# 	skf = StratifiedKFold(n_splits=num_folds)
 
-# 	#Different classifiers to test out
-# 	classifiers = [
-# 	    KNeighborsClassifier(1),
-# 	    KNeighborsClassifier(5)
-# 	]
+def print_results_cv(evaluation_results):
 
-# 	num_classifiers = len(classifiers)
+	for classifier, scores in results.items():
+	    print(classifier)
+	    
+	    for metric, score in scores.items():
+	        print(f'{metric}: {score:.4f}')
+	    
+	    print()
 
-# 	acc_val = np.empty([num_folds,num_classifiers])
 
-# 	#for i, (train_index, val_index) in enumerate(sss.split(X, y, patient_id)):
-# 	#for i, (train_index, val_index) in enumerate(group_kfold.split(X, y, patient_id)):
-# 	for i, (train_index, val_index) in enumerate(skf.split(X, y, patient_id)):
+def train_clf(X_train, y_train, classifiers):
 
-# 		X_train = X[train_index,:]
-# 		y_train = y[train_index]
-# 		X_val = X[val_index,:]
-# 		y_val = y[val_index]
-	
-# 		for j, clf in enumerate(classifiers): 
-	
-# 			#Train the classifier
-# 			clf.fit(X_train,y_train)
-	
-# 			#Evaluate your metric of choice (accuracy is probably not the best choice)
-# 			acc_val[i,j] = accuracy_score(y_val, clf.predict(X_val))
+	trained_classifiers = [classifier.fit(X_train, y_train) for classifier in classifiers]
+
+	return trained_classifiers
+
+
+def evaluate_clf(X_test, y_test, trained_classifiers):
+	# Take trained classifiers as inputs
+
+	results = {}
+    for clf in classifiers:
+        y_pred = clf.predict(X_test)
+
+        if type(clf).__name__ == "KNeighborsClassifier":
+            classifier_name = type(clf).__name__
+            params_dict = clf.get_params()
+            n_neigbors = params_dict["n_neighbors"]
+            classifier_name = f"{classifier_name} with n_neighbors: {n_neigbors}"
+        else:
+            classifier_name = type(clf).__name__
+  
+        
+        results[classifier_name] = {
+            'Accuracy': round(accuracy_score(y_test, y_pred), 3),
+            'Recall': round(recall_score(y_test, y_pred), 3),
+            'Precision': round(precision_score(y_test, y_pred), 3),
+        	'AUC ROC': round(roc_auc_score(y_test, y_pred), 3)
+        }
+    
+    return results
+
+def print_result(results):
+	for classifier, scores in results.items():
+	    print(classifier)
+	    
+	    for metric, score in scores.items():
+	        print(f'{metric}: {score:.4f}')
+	    
+	    print()
+
+
+
+
+
