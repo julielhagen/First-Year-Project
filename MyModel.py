@@ -17,7 +17,7 @@ from sklearn.model_selection import train_test_split, StratifiedGroupKFold, cros
 from sklearn.metrics import accuracy_score, recall_score, precision_score, roc_auc_score #example for measuring performance
 
 # For saving/loading trained classifiers
-import pickle
+import pickle as pk
 
 # Image preperation
 from prep_image import prep_im_and_mask
@@ -158,7 +158,7 @@ def PCA_(X):
 
 # Standardize feature data
 def std_X(X):
-    '''Standardized the input.
+	'''Standardized the input.
 
     Args:
         X (pandas.DataFrame): Data Frame of features.
@@ -183,8 +183,9 @@ def train_pca(X):
 		Nothing
 	'''
 
-	X_std =std_X(X)
+	X_std = std_X(X)
 	pca = PCA(n_components=0.95)
+	pca.fit_transform(X_std)
 
 	pk.dump(pca, open('pca.pkl', 'wb'))
 
@@ -210,7 +211,7 @@ def apply_pca(X):
 ### TRAIN CLASSIFIER ###
 ########################
 
-def cross_validate_clf(X, y, classifiers, groups):
+def cross_validate_clf(X, y, classifiers, grps):
 
 	# Scores for evaluation
 	scores = ['accuracy', 'recall', 'precision', 'roc_auc']
@@ -220,17 +221,17 @@ def cross_validate_clf(X, y, classifiers, groups):
 
 	evaluation_results = {}
 	for classifier in classifiers:
-        cv_results = cross_validate(classifier, X_train, y_train, scoring=scores, cv=cross_val, groups = groups)
+		cv_results = cross_validate(classifier, X, y, scoring=scores, cv=cross_val, groups = grps)
+		
+		if type(classifier).__name__ == "KNeighborsClassifier":
+			classifier_name = type(classifier).__name__
+			params_dict = classifier.get_params()
+			n_neigbors = params_dict["n_neighbors"]
+			classifier_name = f"{classifier_name} with n_neighbors: {n_neigbors}"
+		else:
+			classifier_name = type(classifier).__name__
 
-        if type(classifier).__name__ == "KNeighborsClassifier":
-            classifier_name = type(classifier).__name__
-            params_dict = classifier.get_params()
-            n_neigbors = params_dict["n_neighbors"]
-            classifier_name = f"{classifier_name} with n_neighbors: {n_neigbors}"
-        else:
-            classifier_name = type(classifier).__name__
-
-        evaluation_results[classifier_name] = {
+		evaluation_results[classifier_name] = {
             'Accuracy': cv_results['test_accuracy'].mean(),
             'Recall': cv_results['test_recall'].mean(),
             'Precision': cv_results['test_precision'].mean(),
@@ -238,18 +239,17 @@ def cross_validate_clf(X, y, classifiers, groups):
 
         }
 
-    return evalutation_results
+	return evaluation_results
 
 
 def print_results_cv(evaluation_results):
 
-	for classifier, scores in results.items():
-	    print(classifier)
+	for classifier, scores in evaluation_results.items():
+		print(classifier)
+		for metric, score in scores.items():
+			print(f'{metric}: {score:.4f}')
 	    
-	    for metric, score in scores.items():
-	        print(f'{metric}: {score:.4f}')
-	    
-	    print()
+		print()
 
 
 def train_clf(X_train, y_train, classifiers):
@@ -263,37 +263,31 @@ def evaluate_clf(X_test, y_test, trained_classifiers):
 	# Take trained classifiers as inputs
 
 	results = {}
-    for clf in classifiers:
-        y_pred = clf.predict(X_test)
+	for clf in trained_classifiers:
+		y_pred = clf.predict(X_test)
 
-        if type(clf).__name__ == "KNeighborsClassifier":
-            classifier_name = type(clf).__name__
-            params_dict = clf.get_params()
-            n_neigbors = params_dict["n_neighbors"]
-            classifier_name = f"{classifier_name} with n_neighbors: {n_neigbors}"
-        else:
-            classifier_name = type(clf).__name__
+		if type(clf).__name__ == "KNeighborsClassifier":
+			classifier_name = type(clf).__name__
+			params_dict = clf.get_params()
+			n_neigbors = params_dict["n_neighbors"]
+			classifier_name = f"{classifier_name} with n_neighbors: {n_neigbors}"
+		else:
+			classifier_name = type(clf).__name__
   
         
-        results[classifier_name] = {
+		results[classifier_name] = {
             'Accuracy': round(accuracy_score(y_test, y_pred), 3),
             'Recall': round(recall_score(y_test, y_pred), 3),
             'Precision': round(precision_score(y_test, y_pred), 3),
         	'AUC ROC': round(roc_auc_score(y_test, y_pred), 3)
         }
     
-    return results
+	return results
 
-def print_result(results):
+def print_results(results):
 	for classifier, scores in results.items():
-	    print(classifier)
+		print(classifier)
+		for metric, score in scores.items():
+			print(f'{metric}: {score:.4f}')
 	    
-	    for metric, score in scores.items():
-	        print(f'{metric}: {score:.4f}')
-	    
-	    print()
-
-
-
-
-
+		print()
