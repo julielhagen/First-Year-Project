@@ -81,7 +81,7 @@ def get_rgb_means(image, slic_segments):
         #Get average RGB values from segment
         rgb_mean = np.mean(segment, axis = (0, 1), where = (segment != 0))
         
-        rgb_means.append(rgb_mean)    
+        rgb_means.append(rgb_mean) 
         
     return rgb_means
 
@@ -300,7 +300,7 @@ def color_dominance(image, mask, clusters = 5, include_ratios = False):
     flat_im = np.reshape(hsv_im, (-1, 3)) # Flatten image to 2D array
 
     # Use KMeans to cluster image by colors
-    k_means = KMeans(n_clusters=clusters, random_state=0)
+    k_means = KMeans(n_clusters=clusters, n_init=10, random_state=0)
     k_means.fit(flat_im)
 
     # Save cluster centers (dominant colors) in array
@@ -344,3 +344,38 @@ def plot_dominance_bar(r_and_c):
     left=False,
     labelbottom=False,
     labelleft=False)
+
+
+
+def get_relative_rgb_means(image, slic_segments):
+    '''Get mean RGB values for each segment in a SLIC segmented image.
+
+    Args:
+        image (numpy.ndarray): original image
+        slic_segments (numpy.ndarray): SLIC segmentation
+
+    Returns:
+        rgb_means (list): RGB mean values for each segment.
+    '''
+
+    max_segment_id = np.unique(slic_segments)[-1]
+
+    rgb_means = []
+    for i in range(0, max_segment_id + 1):
+
+        #Create masked image where only specific segment is active
+        segment = image.copy()
+        segment[slic_segments != i] = 0
+
+        #Get average RGB values from segment
+        rgb_mean = np.mean(segment, axis = (0, 1), where = (segment != 0))
+        
+        rgb_means.append(rgb_mean) 
+
+    rgb_means_lesion = np.mean(rgb_means[1:],axis=0)
+    rgb_means_skin = np.mean(rgb_means[0])
+
+    F1, F2, F3 = rgb_means_lesion/sum(rgb_means_lesion)
+    F10, F11, F12 = rgb_means_lesion - rgb_means_skin
+        
+    return F1, F2, F3, F10, F11, F12
