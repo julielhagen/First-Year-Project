@@ -211,7 +211,7 @@ def apply_pca(X):
 ### TRAIN CLASSIFIER ###
 ########################
 
-def cross_validate_clf(X, y, classifiers, grps):
+def cross_validate_clf(X, y, classifiers, groups):
 
 	# Scores for evaluation
 	scores = ['accuracy', 'recall', 'precision', 'roc_auc']
@@ -221,7 +221,7 @@ def cross_validate_clf(X, y, classifiers, grps):
 
 	evaluation_results = {}
 	for classifier in classifiers:
-		cv_results = cross_validate(classifier, X, y, scoring=scores, cv=cross_val, groups = grps)
+		cv_results = cross_validate(classifier, X, y, scoring=scores, cv=cross_val, groups = groups)
 		
 		if type(classifier).__name__ == "KNeighborsClassifier":
 			classifier_name = type(classifier).__name__
