@@ -18,18 +18,16 @@ image_folder = 'images' + os.sep
 mask_folder = 'images_masks' + os.sep
 file_features = 'feature_data.csv'
 
-feature_names = ['assymmetry', 'dom_hue', 'dom_sat', 'dom_val']
-
-# ['assymmetry', 'red_var', 'green_var', 'blue_var', \
-#     'hue_var', 'sat_var', 'val_var', 'dom_hue', 'dom_sat', 'dom_val', \
-#     'compactness', 'convexity']
+feature_names = ['assymmetry', 'red_var', 'green_var', 'blue_var', \
+     'hue_var', 'sat_var', 'val_var', 'dom_hue', 'dom_sat', 'dom_val', \
+     'compactness', 'convexity', 'F1', 'F2', 'F3', 'F10', 'F11', 'F12']
 
 
 ### PROCESS IMAGES ###
 
 # Extract features for all images with masks and save as csv.
 
-#ProcessImages(file_data, image_folder, mask_folder, file_features)
+#ProcessImages(file_data, image_folder, mask_folder, file_features, feature_names)
 
 
 ######################################
@@ -67,7 +65,7 @@ X_train_transformed = apply_pca(X_train)
 classifiers = [KNeighborsClassifier(n_neighbors=i) for i in range(1, 20, 2)]
 
 # Cross Validate
-cv_results = cross_validate_clf(X_train, y_train, classifiers, groups)
+cv_results = cross_validate_clf(X_train_transformed, y_train, classifiers, groups)
 print_results(cv_results)
 
 # Train classifier

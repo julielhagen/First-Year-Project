@@ -24,7 +24,7 @@ from prep_image import prep_im_and_mask
 
 # Feature extraction
 from asymmetry import mean_asymmetry
-from color import slic_segmentation, rgb_var, hsv_var, color_dominance
+from color import slic_segmentation, rgb_var, hsv_var, color_dominance, get_relative_rgb_means
 from compactness import compactness_score
 from convexity import convexity_score
 
@@ -59,16 +59,19 @@ def extract_features(im, im_mask):
 	# Convexity
 	convexity = convexity_score(im_mask)
 
+	# Relative color scores
+	F1, F2, F3, F10, F11, F12 = get_relative_rgb_means(im, segments)
+
 	return [asymmetry, red_var, green_var, blue_var, \
 		hue_var, sat_var, val_var, dom_hue, dom_sat, dom_val, \
-		compactness, convexity]
+		compactness, convexity, F1, F2, F3, F10, F11, F12]
 
 
 ########################
 ### IMAGE PROCESSING ###
 ########################
 
-def ProcessImages(file_data, image_folder, mask_folder, file_features):
+def ProcessImages(file_data, image_folder, mask_folder, file_features, feature_names):
 	# Import metadata from file
 	df = pd.read_csv(file_data)
 
@@ -77,9 +80,6 @@ def ProcessImages(file_data, image_folder, mask_folder, file_features):
 	df = df.loc[df_mask]
 
 	# Features to extract
-	feature_names = ['assymmetry', 'red_var', 'green_var', 'blue_var', \
-		'hue_var', 'sat_var', 'val_var', 'dom_hue', 'dom_sat', 'dom_val', \
-		'compactness', 'convexity']
 	features_n = len(feature_names)
 	
 	features = np.zeros(shape = [len(df), features_n], dtype = np.float16)
