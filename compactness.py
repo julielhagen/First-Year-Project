@@ -41,16 +41,16 @@ def compactness_score(mask):
     mask_eroded = morphology.binary_erosion(mask, struct_el)
 
     #Finding the perimeter of the ground truth
-    perimeter_gt = mask - mask_eroded
+    perimeter = mask - mask_eroded
 
     #Length of the perimeter
-    l = np.sum(perimeter_gt)
+    l = np.sum(perimeter)
 
     compactness = (4*pi*A)/(l**2)
 
     score = round(1-compactness, 3)
 
-    return score
+    return compactness, A, l
 
 ################
 ### PLOTTING ###
@@ -69,12 +69,12 @@ def show_border(mask):
     A = np.sum(mask)
 
     #Structural element, that we will use as a "brush" on our mask
-    struct_el = morphology.disk(2)
+    struct_el = morphology.disk(1)
 
     # Use this "brush" to erode the image - eat away at the borders
     mask_eroded = morphology.binary_erosion(mask, struct_el)
 
     #Finding the perimeter of the ground truth
-    perimeter_gt = mask - mask_eroded
+    perimeter = mask - mask_eroded
 
-    return plt.imshow(perimeter_gt, cmap='gray')
+    return plt.imshow(perimeter, cmap='gray')

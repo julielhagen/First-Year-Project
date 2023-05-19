@@ -18,9 +18,12 @@ image_folder = 'images' + os.sep
 mask_folder = 'images_masks' + os.sep
 file_features = 'feature_data.csv'
 
-feature_names = ['assymmetry', 'red_var', 'green_var', 'blue_var', \
+#feature_names = ['F10', 'F11', 'F12', 'convexity', 'F2', 'dom_hue', 'compactness', 'best_asymmetry']
+
+
+feature_names = ['mean_assymmetry', 'best_asymmetry', 'worst_asymmetry', 'red_var', 'green_var', 'blue_var', \
      'hue_var', 'sat_var', 'val_var', 'dom_hue', 'dom_sat', 'dom_val', \
-     'compactness', 'convexity', 'F1', 'F2', 'F3', 'F10', 'F11', 'F12']
+     'compactness', 'area', 'perimeter', 'convexity', 'F1', 'F2', 'F3', 'F10', 'F11', 'F12']
 
 
 ### PROCESS IMAGES ###
@@ -57,12 +60,19 @@ X_train = X_train[feature_names]
 X_test = X_test[feature_names]
 
 
+# Feature selection
+ft_selector, scores = feature_scores(X_train,y_train, 10)
+X_train = ft_selector.transform(X_train)
+
+
 # PCA
 train_pca(X_train)
 X_train_transformed = apply_pca(X_train)
 
+print(np.shape(X_train_transformed))
+
 # Define classifiers
-classifiers = [KNeighborsClassifier(n_neighbors=i) for i in range(1, 20, 2)]
+classifiers = [KNeighborsClassifier(n_neighbors=3)]#[KNeighborsClassifier(n_neighbors=i) for i in range(1, 20, 2)]
 
 # Cross Validate
 cv_results = cross_validate_clf(X_train_transformed, y_train, classifiers, groups)

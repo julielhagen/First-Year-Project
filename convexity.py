@@ -41,7 +41,7 @@ def convexity_score(mask):
     # Compute convexity as ratio of lesion area to convex hull
     convexity = lesion_area / convex_hull_area
     
-    return round(1-convexity, 3)
+    return convexity #round(1-convexity, 3)
 
 ################
 ### PLOTTING ###

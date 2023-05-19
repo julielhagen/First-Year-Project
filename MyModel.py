@@ -23,7 +23,7 @@ import pickle as pk
 from prep_image import prep_im_and_mask
 
 # Feature extraction
-from asymmetry import mean_asymmetry
+from asymmetry import mean_asymmetry, best_asymmetry, worst_asymmetry
 from color import slic_segmentation, rgb_var, hsv_var, color_dominance, get_relative_rgb_means
 from compactness import compactness_score
 from convexity import convexity_score
@@ -42,7 +42,9 @@ from sklearn.feature_selection import SelectKBest,mutual_info_classif
 def extract_features(im, im_mask):
 
 	# Assymmetry
-	asymmetry = mean_asymmetry(im_mask,4)
+	mean_asym = mean_asymmetry(im_mask,4)
+	best_asym = best_asymmetry(im_mask,4)
+	worst_asym = worst_asymmetry(im_mask,4)
 
 	# Color variance
 	segments = slic_segmentation(im, im_mask)
@@ -54,7 +56,7 @@ def extract_features(im, im_mask):
 	dom_hue, dom_sat, dom_val = dom_colors[0][1]     
 
 	# Compactness
-	compactness = compactness_score(im_mask)
+	compactness, area, perimeter = compactness_score(im_mask)
 
 	# Convexity
 	convexity = convexity_score(im_mask)
@@ -62,9 +64,9 @@ def extract_features(im, im_mask):
 	# Relative color scores
 	F1, F2, F3, F10, F11, F12 = get_relative_rgb_means(im, segments)
 
-	return [asymmetry, red_var, green_var, blue_var, \
+	return [mean_asym, best_asym, worst_asym, red_var, green_var, blue_var, \
 		hue_var, sat_var, val_var, dom_hue, dom_sat, dom_val, \
-		compactness, convexity, F1, F2, F3, F10, F11, F12]
+		compactness, area, perimeter, convexity, F1, F2, F3, F10, F11, F12]
 
 
 ########################
