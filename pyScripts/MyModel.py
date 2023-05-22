@@ -11,12 +11,18 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Default packages for the minimum example
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split, StratifiedGroupKFold, cross_validate
-from sklearn.metrics import accuracy_score, recall_score, precision_score, roc_auc_score #example for measuring performance
+from sklearn.metrics import accuracy_score, recall_score, precision_score, roc_auc_score 
 
-# For saving/loading trained classifiers
+# Feature extraction (PCA)
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
+# Feature selection
+from sklearn.feature_selection import SelectKBest,mutual_info_classif
+
+# For loading and saving classifiers
 import pickle as pk
 
 # Image preperation
@@ -27,13 +33,6 @@ from asymmetry import mean_asymmetry, best_asymmetry, worst_asymmetry
 from color import slic_segmentation, rgb_var, hsv_var, color_dominance, get_relative_rgb_means
 from compactness import compactness_score
 from convexity import convexity_score
-
-# Feature extraction (PCA)
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-
-# Feature selection
-from sklearn.feature_selection import SelectKBest,mutual_info_classif
 
 ###########################
 ### FEATURE EXTRACTIONS ###
@@ -112,7 +111,7 @@ def ProcessImages(file_data, image_folder, mask_folder, file_features, feature_n
 ### FEATURE SELECTION ###
 #########################
 
-def feature_scores(train_X, train_y, k):
+def train_feature_selector(X_train, y_train, k):
     '''Using SelectKBest to extract features from train_X, down to k features as output
     Returns a selector object (which is applied to X_train and X_test afterwards) 
 	and the score for each feature.
@@ -126,37 +125,43 @@ def feature_scores(train_X, train_y, k):
 		feature_selector (selector object): 
         scores (numpy.ndarray): Array containg scores for each feature.    
     '''
+
     feature_selector = SelectKBest(mutual_info_classif, k=k)
-    feature_selector.fit_transform(train_X, train_y)
+    feature_selector.fit_transform(X_train, y_train)
+    
+    pk.dump(feature_selector, open('selector.pkl', 'wb'))
+    
+    return feature_selector
+
+def apply_feature_selector(X):
+
+	feature_selector = pk.load(open('selector.pkl', 'rb'))
+	X_transformed = feature_selector.transform(X)
+
+	return X_transformed
+
+def feature_scores(feature_selector):
+    '''Using SelectKBest to extract features from train_X, down to k features as output
+    Returns a selector object (which is applied to X_train and X_test afterwards) 
+	and the score for each feature.
+
+    Args:
+        train_X (pandas.DataFrame): Data Frame of features from X_train.
+		train_y (pandas.DataFrame): Data Frame of target values from y_train.
+        k (int): Number of features to output.
+
+    Returns:
+		feature_selector (selector object): 
+        scores (numpy.ndarray): Array containg scores for each feature.    
+    '''
     
     scores = feature_selector.scores_
     
-    return feature_selector, scores
+    return scores
 
-##########################
-### FEATURE EXTRACTION ###
-##########################
-
-def PCA_(X):
-    '''Using PCA to extract features from X, down to n features as output. 
-    The features in X are first standardized, then
-
-    Args:
-        X (pandas.DataFrame): Data Frame of features.
-        n (int): Number of features to keep.
-
-    Returns:
-        X_std_pca (numpy.ndarray): Array containg n standardized features.    
-    '''
-
-    X_std = std_X(X)
-    
-    pca = PCA(n_components=0.95)
-    X_std_pca = pca.fit_transform(X_std)
-
-    pk.dump(pca, open('pca.pkl', 'wb'))
-
-    return X_std_pca
+###########
+### PCA ###
+###########
 
 # Standardize feature data
 def std_X(X):

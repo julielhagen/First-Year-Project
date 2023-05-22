@@ -13,10 +13,10 @@ from MyModel import * #ProcessImages, std_X, train_pca, apply_pca, cross_validat
 ### COMSTANTS ###
 #################
 
-file_data = 'metadata_withmasks.csv'
-image_folder = 'images' + os.sep
-mask_folder = 'images_masks' + os.sep
-file_features = 'feature_data.csv'
+file_data = '..' + os.sep + 'metadata_withmasks.csv'
+image_folder = '..' + os.sep + 'images' + os.sep
+mask_folder = '..' + os.sep + 'images_masks' + os.sep
+file_features = '..' + os.sep + 'feature_data.csv'
 
 #feature_names = ['F10', 'F11', 'F12', 'convexity', 'F2', 'dom_hue', 'compactness', 'best_asymmetry']
 
@@ -61,9 +61,8 @@ X_test = X_test[feature_names]
 
 
 # Feature selection
-ft_selector, scores = feature_scores(X_train,y_train, 10)
-X_train = ft_selector.transform(X_train)
-
+train_feature_selector(X_train, y_train, 10)
+X_train = apply_feature_selector(X_train)
 
 # PCA
 train_pca(X_train)
@@ -72,19 +71,23 @@ X_train_transformed = apply_pca(X_train)
 print(np.shape(X_train_transformed))
 
 # Define classifiers
-classifiers = [KNeighborsClassifier(n_neighbors=3)]#[KNeighborsClassifier(n_neighbors=i) for i in range(1, 20, 2)]
+classifiers = [KNeighborsClassifier(n_neighbors=i) for i in range(1, 20, 2)]
 
 # Cross Validate
 cv_results = cross_validate_clf(X_train_transformed, y_train, classifiers, groups)
 print_results(cv_results)
 
 # Train classifier
-#trained_classifiers = train_clf(X_train, y_train, classifiers)
+#clf = [KNeighborsClassifier(n_neighbors = 3)]
+#trained_classifiers = train_clf(X_train_transformed, y_train, classifiers)
 
 #Evaluate model
+#X_test = apply_feature_selector(X_test)
 #X_test_transformed = apply_pca(X_test)
-#evaluation_results = evaluate_clf(X_test, y_test, trained_classifiers)
+#evaluation_results = evaluate_clf(X_test_transformed, y_test, trained_classifiers)
 
 #print_results(evaluation_results)
+
+# Train and save final classifier
 
 
