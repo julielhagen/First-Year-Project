@@ -190,9 +190,10 @@ def train_pca(X):
 		Nothing
 	'''
 
-	X_std = std_X(X)
+	#X_std = std_X(X)
+	X_normalized = (X - X.mean()) / X.std()
 	pca = PCA(n_components=0.95)
-	pca.fit_transform(X_std)
+	pca.fit_transform(X_normalized)
 
 	pk.dump(pca, open('pca.pkl', 'wb'))
 
@@ -209,8 +210,9 @@ def apply_pca(X):
 
 	pca = pk.load(open('pca.pkl', 'rb'))
 
-	X_std =std_X(X)
-	X_transformed = pca.transform(X_std)
+	#X_std =std_X(X)
+	X_normalized = (X - X.mean()) / X.std()
+	X_transformed = pca.transform(X_normalized)
 
 	return X_transformed
 

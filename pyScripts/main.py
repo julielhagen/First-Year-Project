@@ -5,8 +5,7 @@
 ###############
 
 import os
-
-from MyModel import * #ProcessImages, std_X, train_pca, apply_pca, cross_validate, print_results,
+from MyModel import *
 
 
 #################
@@ -18,11 +17,9 @@ image_folder = '..' + os.sep + 'images' + os.sep
 mask_folder = '..' + os.sep + 'images_masks' + os.sep
 file_features = '..' + os.sep + 'feature_data.csv'
 
-#feature_names = ['F10', 'F11', 'F12', 'convexity', 'F2', 'dom_hue', 'compactness', 'best_asymmetry']
 
-
-feature_names = ['mean_assymmetry', 'best_asymmetry', 'worst_asymmetry', 'red_var', 'green_var', 'blue_var', \
-     'hue_var', 'sat_var', 'val_var', 'dom_hue', 'dom_sat', 'dom_val', \
+feature_names = ['mean_assymmetry', 'best_asymmetry', 'worst_asymmetry', 'red_var', 'green_var', \
+     'blue_var', 'hue_var', 'sat_var', 'val_var', 'dom_hue', 'dom_sat', 'dom_val', \
      'compactness', 'area', 'perimeter', 'convexity', 'F1', 'F2', 'F3', 'F10', 'F11', 'F12']
 
 
@@ -52,7 +49,7 @@ y = (labels == 'BCC') | (labels == 'SCC') | (labels == 'MEL')
 ### TRAIN MODEL ###
 
 # Split in train test
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 41, stratify = y)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, stratify = y)
 
 
 groups = X_train['patient_id']
