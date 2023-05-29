@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split, StratifiedGroupKFold, cross_validate
-from sklearn.metrics import accuracy_score, recall_score, precision_score, roc_auc_score 
+from sklearn.metrics import accuracy_score, recall_score, precision_score, roc_auc_score, make_scorer 
 
 # Feature extraction (PCA)
 from sklearn.preprocessing import StandardScaler
@@ -46,7 +46,7 @@ def extract_features(im, im_mask):
 	worst_asym = worst_asymmetry(im_mask,4)
 
 	# Color variance
-	segments = slic_segmentation(im, im_mask)
+	segments = slic_segmentation(im, im_mask, n_segments=250)
 	red_var, green_var, blue_var = rgb_var(im, segments)
 	hue_var, sat_var, val_var = hsv_var(im, segments)
 
@@ -55,7 +55,7 @@ def extract_features(im, im_mask):
 	dom_hue, dom_sat, dom_val = dom_colors[0][1]     
 
 	# Compactness
-	compactness, area, perimeter = compactness_score(im_mask)
+	compactness = compactness_score(im_mask)
 
 	# Convexity
 	convexity = convexity_score(im_mask)
@@ -63,9 +63,9 @@ def extract_features(im, im_mask):
 	# Relative color scores
 	F1, F2, F3, F10, F11, F12 = get_relative_rgb_means(im, segments)
 
-	return [mean_asym, best_asym, worst_asym, red_var, green_var, blue_var, \
-		hue_var, sat_var, val_var, dom_hue, dom_sat, dom_val, \
-		compactness, area, perimeter, convexity, F1, F2, F3, F10, F11, F12]
+	return [mean_asym, best_asym, worst_asym, red_var, green_var, \
+		blue_var, hue_var, sat_var, val_var, dom_hue, dom_sat, \
+		dom_val, compactness, convexity, F1, F2, F3, F10, F11, F12]
 
 
 ########################
@@ -179,7 +179,7 @@ def std_X(X):
 
 	return X_std
 
-def train_pca(X):
+def train_pca(X, n=0.95):
 	'''Train PCA. Save the result.
 
 	Args:
@@ -192,7 +192,7 @@ def train_pca(X):
 
 	#X_std = std_X(X)
 	X_normalized = (X - X.mean()) / X.std()
-	pca = PCA(n_components=0.95)
+	pca = PCA(n_components=n)
 	pca.fit_transform(X_normalized)
 
 	pk.dump(pca, open('pca.pkl', 'wb'))
@@ -223,7 +223,7 @@ def apply_pca(X):
 def cross_validate_clf(X, y, classifiers, groups):
 
 	# Scores for evaluation
-	scores = ['accuracy', 'recall', 'precision', 'roc_auc']
+	scores ={'accuracy': make_scorer(accuracy_score), 'sensitivity': make_scorer(recall_score), 'specificity': make_scorer(recall_score, pos_label=0), 'precision': make_scorer(precision_score), 'roc_auc': make_scorer(roc_auc_score)}
 
 	num_folds = 5
 	cross_val = StratifiedGroupKFold(n_splits= num_folds)	
@@ -236,13 +236,14 @@ def cross_validate_clf(X, y, classifiers, groups):
 			classifier_name = type(classifier).__name__
 			params_dict = classifier.get_params()
 			n_neigbors = params_dict["n_neighbors"]
-			classifier_name = f"{classifier_name} with n_neighbors: {n_neigbors}"
+			classifier_name = f"{classifier_name} with n_neighbors={n_neigbors}"
 		else:
 			classifier_name = type(classifier).__name__
 
 		evaluation_results[classifier_name] = {
             'Accuracy': cv_results['test_accuracy'].mean(),
-            'Recall': cv_results['test_recall'].mean(),
+            'Sensitivity': cv_results['test_sensitivity'].mean(),
+            'Specificity': cv_results['test_specificity'].mean(),
             'Precision': cv_results['test_precision'].mean(),
             'ROC AUC': cv_results['test_roc_auc'].mean()
 
@@ -283,10 +284,10 @@ def evaluate_clf(X_test, y_test, trained_classifiers):
 		else:
 			classifier_name = type(clf).__name__
   
-        
 		results[classifier_name] = {
             'Accuracy': round(accuracy_score(y_test, y_pred), 3),
-            'Recall': round(recall_score(y_test, y_pred), 3),
+            'Sensitivity': round(recall_score(y_test, y_pred, pos_label = 1), 3),
+            'Specificity': round(recall_score(y_test, y_pred, pos_label = 0),3),
             'Precision': round(precision_score(y_test, y_pred), 3),
         	'AUC ROC': round(roc_auc_score(y_test, y_pred), 3)
         }

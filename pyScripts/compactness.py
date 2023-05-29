@@ -50,7 +50,7 @@ def compactness_score(mask):
 
     score = round(1-compactness, 3)
 
-    return compactness, A, l
+    return compactness
 
 ################
 ### PLOTTING ###
@@ -69,7 +69,7 @@ def show_border(mask):
     A = np.sum(mask)
 
     #Structural element, that we will use as a "brush" on our mask
-    struct_el = morphology.disk(1)
+    struct_el = morphology.disk(2)
 
     # Use this "brush" to erode the image - eat away at the borders
     mask_eroded = morphology.binary_erosion(mask, struct_el)

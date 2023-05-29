@@ -76,10 +76,10 @@ def get_rgb_means(image, slic_segments):
 
         #Create masked image where only specific segment is active
         segment = image.copy()
-        segment[slic_segments != i] = 0
+        segment[slic_segments != i] = -1
 
         #Get average RGB values from segment
-        rgb_mean = np.mean(segment, axis = (0, 1), where = (segment != 0))
+        rgb_mean = np.mean(segment, axis = (0, 1), where = (segment != -1))
         
         rgb_means.append(rgb_mean) 
         
@@ -365,10 +365,10 @@ def get_relative_rgb_means(image, slic_segments):
 
         #Create masked image where only specific segment is active
         segment = image.copy()
-        segment[slic_segments != i] = 0
+        segment[slic_segments != i] = -1
 
         #Get average RGB values from segment
-        rgb_mean = np.mean(segment, axis = (0, 1), where = (segment != 0))
+        rgb_mean = np.mean(segment, axis = (0, 1), where = (segment != -1))
         
         rgb_means.append(rgb_mean) 
 
