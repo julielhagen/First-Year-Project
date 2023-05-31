@@ -5,7 +5,7 @@
 ###############
 
 import os
-from MyModel import *
+from model import *
 
 #################
 ### COMSTANTS ###
@@ -14,8 +14,7 @@ from MyModel import *
 file_data = '..' + os.sep + 'data' + os.sep + 'meta_data' + os.sep + 'metadata_withmasks.csv'
 image_folder = '..' + os.sep + 'images' + os.sep + 'img' + os.sep
 mask_folder = '..' + os.sep + 'images' + os.sep + 'mask' + os.sep
-file_features = '..' + os.sep + 'data' + os.sep + 'feature_data' + os.sep +  'feature_data.csv'
-
+file_features = '..' + os.sep + 'data' + os.sep + 'feature_data' + os.sep + 'feature_data.csv'
 
 feature_names = ['mean_assymmetry', 'best_asymmetry', 'worst_asymmetry', 'red_var', 'green_var', \
      'blue_var', 'hue_var', 'sat_var', 'val_var', 'dom_hue', 'dom_sat', 'dom_val', \
