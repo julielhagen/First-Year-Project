@@ -208,7 +208,7 @@ def apply_pca(X):
 
 	pca = pk.load(open('pca.pkl', 'rb'))
 
-	#X_std =std_X(X)
+	#X_std = std_X(X)
 	X_normalized = (X - X.mean()) / X.std()
 	X_transformed = pca.transform(X_normalized)
 
@@ -249,7 +249,6 @@ def cross_validate_clf(X, y, classifiers, groups):
 
 	return evaluation_results
 
-
 def print_results_cv(evaluation_results):
 
 	for classifier, scores in evaluation_results.items():
@@ -265,7 +264,6 @@ def train_clf(X_train, y_train, classifiers):
 	trained_classifiers = [classifier.fit(X_train, y_train) for classifier in classifiers]
 
 	return trained_classifiers
-
 
 def evaluate_clf(X_test, y_test, trained_classifiers):
 	# Take trained classifiers as inputs

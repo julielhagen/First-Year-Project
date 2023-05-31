@@ -61,4 +61,3 @@ trained_clf = trained_classifiers[0]
 
 # Save final classifier
 pk.dump(trained_clf, open('classifier.pkl', 'wb'))
-
