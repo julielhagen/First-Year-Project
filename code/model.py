@@ -39,6 +39,18 @@ from convexity import convexity_score
 ###########################
 
 def extract_features(im, im_mask):
+	'''
+    Extract a set of features from an image and its corresponding mask.
+
+    Args:
+        im (array-like): Input image.
+        im_mask (array-like): Mask corresponding to the image.
+
+    Returns:
+        list: List of extracted features, including asymmetry measures, color variances, color dominance, compactness,
+              convexity, and relative color scores.
+
+    '''
 
 	# Assymmetry
 	mean_asym = mean_asymmetry(im_mask,4)
@@ -72,6 +84,16 @@ def extract_features(im, im_mask):
 ########################
 
 def ProcessImages(file_data, image_folder, mask_folder, file_features, feature_names):
+	'''
+    Process images and extract features.
+    
+    Args:
+        file_data (str): File path or file object containing metadata.
+        image_folder (str): Path to the folder containing the images.
+        mask_folder (str): Path to the folder containing the masks.
+        file_features (str): File path or file object to save the extracted features.
+        feature_names (list): List of feature names.
+    '''
 	# Import metadata from file
 	df = pd.read_csv(file_data)
 
@@ -132,6 +154,14 @@ def train_feature_selector(X_train, y_train, k):
     return feature_selector
 
 def apply_feature_selector(X):
+	'''Apply feature selector to transform the input features.
+    
+    Args:
+        X (array-like): Input feature matrix or dataset.
+        
+    Returns:
+        array-like: Transformed feature matrix.
+    '''
 
 	feature_selector = pk.load(open('selector.pkl', 'rb'))
 	X_transformed = feature_selector.transform(X)
@@ -184,11 +214,8 @@ def train_pca(X, n=0.95):
 	    X (pandas.DataFrame): Data Frame of features.
 	    n (float): Percentage of variation that should be explained by the chosen features.
 
-	Returns:
-		Nothing
 	'''
 
-	#X_std = std_X(X)
 	X_normalized = (X - X.mean()) / X.std()
 	pca = PCA(n_components=n)
 	pca.fit_transform(X_normalized)
@@ -208,7 +235,6 @@ def apply_pca(X):
 
 	pca = pk.load(open('pca.pkl', 'rb'))
 
-	#X_std = std_X(X)
 	X_normalized = (X - X.mean()) / X.std()
 	X_transformed = pca.transform(X_normalized)
 
@@ -219,6 +245,18 @@ def apply_pca(X):
 ########################
 
 def cross_validate_clf(X, y, classifiers, groups):
+	'''Perform cross-validation for multiple classifiers on the input data.
+
+    Args:
+        X (array-like): Input feature matrix or dataset.
+        y (array-like): Target variable or labels.
+        classifiers (list): List of classifier objects to be evaluated.
+        groups (array-like): Groups or categories for stratified grouping in cross-validation.
+
+    Returns:
+        dict: Dictionary containing evaluation results for each classifier, with metrics such as Accuracy, Sensitivity,
+              Specificity, Precision, and ROC AUC.
+	'''
 
 	# Scores for evaluation
 	scores ={'accuracy': make_scorer(accuracy_score), 'sensitivity': make_scorer(recall_score), 'specificity': make_scorer(recall_score, pos_label=0), 'precision': make_scorer(precision_score), 'roc_auc': make_scorer(roc_auc_score)}
@@ -250,6 +288,12 @@ def cross_validate_clf(X, y, classifiers, groups):
 	return evaluation_results
 
 def print_results_cv(evaluation_results):
+	'''Print the evaluation results for cross-validated classifiers.
+
+    Args:
+        evaluation_results (dict): Dictionary containing evaluation results for each classifier.
+
+    '''
 
 	for classifier, scores in evaluation_results.items():
 		print(classifier)
@@ -260,14 +304,38 @@ def print_results_cv(evaluation_results):
 
 
 def train_clf(X_train, y_train, classifiers):
+	'''
+    Train multiple classifiers on the input training data.
+
+    Args:
+        X_train (array-like): Input feature matrix or dataset for training.
+        y_train (array-like): Target variable or labels for training.
+        classifiers (list): List of classifier objects to be trained.
+
+    Returns:
+        list: List of trained classifier objects.
+
+    '''
 
 	trained_classifiers = [classifier.fit(X_train, y_train) for classifier in classifiers]
 
 	return trained_classifiers
 
 def evaluate_clf(X_test, y_test, trained_classifiers):
-	# Take trained classifiers as inputs
+	'''
+    Evaluate the performance of trained classifiers on the test data.
 
+    Args:
+        X_test (array-like): Input feature matrix or dataset for testing.
+        y_test (array-like): Target variable or labels for testing.
+        trained_classifiers (list): List of trained classifier objects.
+
+    Returns:
+        dict: Dictionary containing evaluation results for each classifier, with metrics such as Accuracy, Sensitivity,
+              Specificity, Precision, and AUC ROC.
+
+    '''
+	# Take trained classifiers as inputs
 	results = {}
 	for clf in trained_classifiers:
 		y_pred = clf.predict(X_test)
@@ -291,6 +359,13 @@ def evaluate_clf(X_test, y_test, trained_classifiers):
 	return results
 
 def print_results(results):
+	'''
+    Print the evaluation results.
+
+    Args:
+        results (dict): Dictionary containing evaluation results for each classifier.
+
+    '''
 	for classifier, scores in results.items():
 		print(classifier)
 		for metric, score in scores.items():
