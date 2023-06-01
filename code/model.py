@@ -265,7 +265,7 @@ def cross_validate_clf(X, y, classifiers, groups):
 	'''
 
 	# Scores for evaluation
-	scores ={'accuracy': make_scorer(accuracy_score), 'sensitivity': make_scorer(recall_score), 'specificity': make_scorer(recall_score, pos_label=0), 'precision': make_scorer(precision_score), 'roc_auc': make_scorer(roc_auc_score)}
+	scores ={'accuracy': make_scorer(accuracy_score), 'sensitivity': make_scorer(recall_score), 'specificity': make_scorer(recall_score, pos_label=0), 'precision': make_scorer(precision_score), 'roc_auc': make_scorer(roc_auc_score, needs_proba=True)}
 
 	num_folds = 5
 	cross_val = StratifiedGroupKFold(n_splits= num_folds)	
