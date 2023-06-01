@@ -1,5 +1,3 @@
-### UNFINISHED !!!
-
 ###############
 ### IMPORTS ###
 ###############
@@ -25,7 +23,7 @@ feature_names = ['mean_assymmetry', 'best_asymmetry', 'worst_asymmetry', 'red_va
 ##########################
 
 # Extract features for all images with masks and save as csv.
-#ProcessImages(file_data, image_folder, mask_folder, file_features, feature_names)
+# ProcessImages(file_data, image_folder, mask_folder, file_features, feature_names)
 
 ############################
 ###   TRAIN CLASSIFIER   ###
@@ -45,13 +43,22 @@ df_features = pd.read_csv(file_features)
 X = df_features[feature_names]
 y = (labels == 'BCC') | (labels == 'SCC') | (labels == 'MEL') 
 
+print('X shape: ', X.shape)
+
+# Standardise scaler
+train_scaler(X)
+X_scaled = apply_scalar(X)
+print('X_scaled shape:', X_scaled.shape)
+
 # PCA
-train_pca(X)
-X_transformed = apply_pca(X)
+train_pca(X_scaled)
+X_transformed = apply_pca(X_scaled)
+print('X transformed shape (after PCA)', X_transformed.shape)
 
 # Feature selection
 train_feature_selector(X_transformed, y, 4)
 X_transformed = apply_feature_selector(X_transformed)
+print('X transformed shape (after feature selector)', X_transformed.shape)
 
 # Train classifier
 clf = [KNeighborsClassifier(n_neighbors = 7)]
