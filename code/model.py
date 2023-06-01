@@ -191,8 +191,15 @@ def feature_scores(feature_selector):
 ### PCA ###
 ###########
 
+def train_scaler(X):
+
+	std_scl = StandardScaler().set_output(transform='pandas')
+	std_scl.fit_transform(X)
+
+	pk.dump(std_scl, open('scaler.pkl', 'wb'))	
+
 # Standardize feature data
-def std_X(X):
+def apply_scalar(X):
 	'''Standardized the input.
 
     Args:
@@ -202,10 +209,11 @@ def std_X(X):
         X_std (numpy.ndarray): Array containg standardized features.    
     '''
 
-	std_scl = StandardScaler()
-	X_std = std_scl.fit_transform(X)
+	s
 
-	return X_std
+	X_scaled = scaler.transform(X)
+
+	return X_scaled
 
 def train_pca(X, n=0.95):
 	'''Train PCA. Save the result.
@@ -216,9 +224,9 @@ def train_pca(X, n=0.95):
 
 	'''
 
-	X_normalized = (X - X.mean()) / X.std()
+	# X_normalized = (X - X.mean()) / X.std()
 	pca = PCA(n_components=n)
-	pca.fit_transform(X_normalized)
+	pca.fit_transform(X)
 
 	pk.dump(pca, open('pca.pkl', 'wb'))
 
@@ -234,9 +242,7 @@ def apply_pca(X):
 	'''
 
 	pca = pk.load(open('pca.pkl', 'rb'))
-
-	X_normalized = (X - X.mean()) / X.std()
-	X_transformed = pca.transform(X_normalized)
+	X_transformed = pca.transform(X)
 
 	return X_transformed
 
