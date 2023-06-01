@@ -209,8 +209,7 @@ def apply_scalar(X):
         X_std (numpy.ndarray): Array containg standardized features.    
     '''
 
-	s
-
+	scaler = pk.load(open('scaler.pkl', 'rb'))
 	X_scaled = scaler.transform(X)
 
 	return X_scaled
