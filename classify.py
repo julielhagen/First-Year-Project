@@ -1,11 +1,27 @@
-### FUNCTION THAT CLASSIFIES NEW IMAGES 
-### TO USE: 
-### 1. from classify import classify
-### 2. call classify function on the new image(s) and its/their mask(s)
+### Main classification function used to classify new images.
+
+### To use as import: 
+### 1. From classify import classify
+### 2. Call classify function on the new image and its mask
+
+### To run as script:
+### 1. Run classify.py
+### 2. Input image id (excluding ticks)
+### 3. Input mask id (excluding ticks)
 
 import pickle as pk
-from code.model import extract_features, apply_pca, apply_feature_selector
+import pandas as pd
+import numpy as np
+import os
 from skimage.transform import resize
+
+import sys
+sys.path.append("code")
+from model import extract_features
+
+feature_names = ['mean_assymmetry', 'best_asymmetry', 'worst_asymmetry', 'red_var', 'green_var', \
+     'blue_var', 'hue_var', 'sat_var', 'val_var', 'dom_hue', 'dom_sat', 'dom_val', \
+     'compactness', 'convexity', 'F1', 'F2', 'F3', 'F10', 'F11', 'F12']
 
 def classify(img, mask):
     '''Predict label and and probability for image and mask using trained 
@@ -20,19 +36,62 @@ def classify(img, mask):
         pred_prob (float): predicted probability
     '''
 
+    # Cut of any potential extra color channels
+    img = img[:, :, :3]
+    if len(mask.shape) == 3:
+        mask = mask[:, :, 0] # Some masks have more than 2 dimensions, which we slice off here
+
+    # Resize
     img = resize(img, (300, 300))
+    mask = resize(mask, (300, 300))
 
-    X = extract_features(img, mask)
+    # Assert mask is binary
+    binary_mask = np.zeros_like(mask)
+    binary_mask[mask > .5] = 1
+    mask = binary_mask.astype(int)
 
-    X_transformed = apply_pca(X)
+    # Extract features into dataframe and add column names
+    X = pd.DataFrame(extract_features(img, mask)).T # Transpose dataframe to get features as columns
+    X.columns = feature_names
 
-    X_transformed = apply_feature_selector(X)
+    # Apply scalar
+    scaler = pk.load(open('code' + os.sep + 'scaler.pkl', 'rb'))
+    X_scaled = scaler.transform(X)
 
-    classifier = pk.load(open('classifier.pkl', 'rb'))
+    # Apply PCA
+    pca = pk.load(open('code' + os.sep + 'pca.pkl', 'rb'))
+    X_transformed = pca.transform(X_scaled)
 
-    pred_label = classifier.predict(X_transformed)
-    pred_prob = classifier.predict_proba(X_transformed)
+    # Apply feature selector
+    feature_selector = pk.load(open('code' + os.sep + 'selector.pkl', 'rb'))
+    X_transformed = feature_selector.transform(X_transformed)
 
-    return pred_label, pred_prob
+    # Import classifier
+    classifier = pk.load(open('code' + os.sep + 'classifier.pkl', 'rb'))
 
+    pred_label = classifier.predict(X_transformed)[0]
+    pred_prob = classifier.predict_proba(X_transformed)[0][1]
 
+    if pred_label:
+        diagnoses = 'unhealthy'
+    else:
+        diagnoses = 'healthy'
+
+    print(f'Predicted label: {pred_label} ({diagnoses})')
+    print(f'Predicted probability of lesion being unhealthy: {round(pred_prob, 4)}')
+
+if __name__ == '__main__':
+
+    import matplotlib.pyplot as plt
+
+    print('\nInput image and mask file names (including file extensions, excluding ticks).\n')
+
+    im_id = input('Image file name: ')
+    mask_id = input('Mask file name: ')
+
+    print('\n')
+
+    im = plt.imread(im_id)
+    mask = plt.imread(mask_id)
+
+    classify(im, mask)

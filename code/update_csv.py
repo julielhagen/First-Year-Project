@@ -1,4 +1,4 @@
-# FILE ONLY TO UPDATE MASK COLUMN IN METADATA COPY
+# Run this script to update mask column in metadata_withmasks.csv file.
 
 import pandas as pd
 import os
@@ -7,7 +7,7 @@ import os
 df = pd.read_csv('..' + os.sep + 'data' + os.sep + 'meta_data' + os.sep + 'raw' + os.sep + 'metadata.csv')
 
 # List of mask names
-mask_ids = os.listdir('..' + os.sep + 'images' + os.sep + 'mask' + os.sep)
+mask_ids = os.listdir('..' + os.sep + 'data' + os.sep + 'images' + os.sep + 'mask' + os.sep)
 
 # Update dataframe from masks in mask_ids
 for i, row in df.iterrows():
@@ -20,6 +20,6 @@ for i, row in df.iterrows():
 
 df['mask']=df['mask'].astype('int')
 
-# Remove old metadata file and write new one
+# Remove old metadata_withmasks.csv file and write new one
 os.remove('..' + os.sep + 'data' + os.sep + 'meta_data' + os.sep + 'metadata_withmasks.csv')
 df.to_csv('..' + os.sep + 'data' + os.sep + 'meta_data' + os.sep + 'metadata_withmasks.csv')
